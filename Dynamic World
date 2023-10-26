@@ -16,45 +16,38 @@ var roi =
 //Dynamic world data - Canadian wildfire areas
 
 
-//Call on Canada shapefile
+//Call on wildfire data for 2018
+var fires = ee.FeatureCollection('users/salem043/CAN_FIRES/nbac_2018_r9_20210810');
+//Map.addLayer(fires);
 
-//var Canada = ee.FeatureCollection("FAO/GAUL/2015/level1").filter(ee.Filter.eq("ADM0_NAME", "Canada"));
-
-
-//Subset to BC and Alberta
-//var ROI = Canada.filter(ee.Filter.inList('ADM1_CODE', [825, 826]));
+//I use the wildfire data to clip to one ROI around several fires in BC in 2018
 
 
-//Call on wildfire data
-var fires = ee.FeatureCollection('users/salem043/CAN_FIRES/nbac_2018_r9_20210810')
-Map.addLayer(fires);
-
-//I use the wildfire data to clip to one ROI
-
-//Call on Dynamic World clipped to ROI for different years
+//Call on Dynamic World clipped to ROI for different years based on summer imagery
+  //Takes mode of several layers to obtain composite of most likely classification.
 
 var lc_16 = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
-  .filterDate("2016-01-01", "2016-12-31")
+  .filterDate("2016-04-21", "2016-09-20")
   .filterBounds(roi).select("label")
   .reduce(ee.Reducer.mode());
 
 var lc_17 = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
-  .filterDate("2017-01-01", "2017-12-31")
+  .filterDate("2016-04-21", "2016-09-20")
   .filterBounds(roi).select("label")
   .reduce(ee.Reducer.mode());
 
 var lc_18 = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
-  .filterDate("2018-01-01", "2018-12-31")
+  .filterDate("2016-04-21", "2016-09-20")
   .filterBounds(roi).select("label")
   .reduce(ee.Reducer.mode());
 
 var lc_19 = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
-  .filterDate("2019-01-01", "2019-12-31")
+  .filterDate("2016-04-21", "2016-09-20")
   .filterBounds(roi).select("label")
   .reduce(ee.Reducer.mode());
 
 var lc_20 = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
-  .filterDate("2020-01-01", "2020-12-31")
+  .filterDate("2020-04-21", "2020-09-20")
   .filterBounds(roi).select("label")
   .reduce(ee.Reducer.mode());
 
@@ -66,7 +59,16 @@ var dwVisParams = {
   palette: ['#419bdf', '#397d49', '#88b053', '#7a87c6', '#e49635', '#dfc35a', '#c4281b', '#a59b8f', '	#b39fe1']
 }
 
-Map.addLayer(demo_2016, dwVisParams, 'Classified image');
+Map.addLayer(lc_16, dwVisParams, 'LULC_2016');
+Map.addLayer(lc_17, dwVisParams, 'LULC_2017');
+Map.addLayer(lc_18, dwVisParams, 'LULC_2018');
+Map.addLayer(lc_19, dwVisParams, 'LULC_2019');
+Map.addLayer(lc_20, dwVisParams, 'LULC_2020');
+
+
+
+
+Map.addLayer(fires, {}, "Fire shapefile");
 
 //Map.addLayer(tile);
 //Map.centerObject(tile, 5);
