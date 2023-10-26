@@ -1,6 +1,10 @@
 //Dynamic world data - Canadian wildfire areas
 
+
 //Call on Canada shapefile
+
+var Canada = ee.FeatureCollection("FAO/GAUL/2015/level1")
+.filter(ee.Filter.eq("ADM0_NAME", "Canada"));
 
 
 //Subset to BC and Alberta
