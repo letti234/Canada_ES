@@ -32,17 +32,17 @@ var lc_16 = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
   .reduce(ee.Reducer.mode());
 
 var lc_17 = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
-  .filterDate("2016-04-21", "2016-09-20")
+  .filterDate("2017-04-21", "2017-09-20")
   .filterBounds(roi).select("label")
   .reduce(ee.Reducer.mode());
 
 var lc_18 = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
-  .filterDate("2016-04-21", "2016-09-20")
+  .filterDate("2018-04-21", "2018-09-20")
   .filterBounds(roi).select("label")
   .reduce(ee.Reducer.mode());
 
 var lc_19 = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
-  .filterDate("2016-04-21", "2016-09-20")
+  .filterDate("2019-04-21", "2019-09-20")
   .filterBounds(roi).select("label")
   .reduce(ee.Reducer.mode());
 
