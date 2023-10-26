@@ -4,9 +4,9 @@
 //Call on Canada shapefile
 
 var Canada = ee.FeatureCollection("FAO/GAUL/2015/level1")
-.filter(ee.Filter.eq("ADM1_NAME", "British Columbia"));
+.filter(ee.Filter.eq("ADM0_NAME", "Canada"));
 
-Map.addLayer(Canada);
+print(Canada);
 
 //Subset to BC and Alberta
 
