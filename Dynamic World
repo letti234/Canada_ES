@@ -23,7 +23,6 @@ var lulc = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
   .filterBounds(ROI)
   .map(function(image){return image.clip(ROI)}) ;
   
-print("Dynamic world data", lulc.limit(1000));
 
 //demo tile
 var tile = lulc.first();
