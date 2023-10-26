@@ -6,9 +6,12 @@
 var Canada = ee.FeatureCollection("FAO/GAUL/2015/level1")
 .filter(ee.Filter.eq("ADM0_NAME", "Canada"));
 
-print(Canada);
+//print(Canada);
 
 //Subset to BC and Alberta
+var BC = Canada.filter(ee.Filter.eq("ADM1_NAME", "British Columbia"));
+
+Map.addLayer(BC);
 
 //Call on wildfire data
 
