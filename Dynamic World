@@ -13,11 +13,22 @@ var ROI = Canada.filter(ee.Filter.inList('ADM1_CODE', [825, 826]));
 Map.addLayer(ROI);
 
 //Call on wildfire data
+//fires = ee.FeatureCollection()
 
+//Subset wildfire data to BC and Alberta
 
-//Call on Dynamic World
+//Call on Dynamic World clipped to ROI
 
+var lulc = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
+  .filterBounds(ROI)
+  .map(function(image){return image.clip(ROI)}) ;
+  
+print("Dynamic world data", lulc.limit(1000));
 
+//demo tile
+var tile = lulc.first();
+Map.addLayer(tile);
+Map.centerObject(tile, 5);
 //Crop Dynamic World to BC and AL
 
 
