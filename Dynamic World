@@ -1,0 +1,23 @@
+//Dynamic world data - Canadian wildfire areas
+
+//Call on Canada shapefile
+
+
+//Subset to BC and Alberta
+
+//Call on wildfire data
+
+
+//Call on Dynamic World
+
+
+//Crop Dynamic World to BC and AL
+
+
+//Decompose Dynamic World into annual images
+
+
+
+
+
+//Map annual images 
