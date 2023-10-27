@@ -58,12 +58,14 @@ var dwVisParams = {
   palette: ['#419bdf', '#397d49', '#88b053', '#7a87c6', '#e49635', '#dfc35a', '#c4281b', '#a59b8f', '	#b39fe1']
 };
 
+Map.centerObject(roi);
+
 //Map LULC
-Map.addLayer(lc_16, dwVisParams, 'LULC_2016');
-Map.addLayer(lc_17, dwVisParams, 'LULC_2017');
-Map.addLayer(lc_18, dwVisParams, 'LULC_2018');
-Map.addLayer(lc_19, dwVisParams, 'LULC_2019');
-Map.addLayer(lc_20, dwVisParams, 'LULC_2020');
+Map.addLayer(lc_16, dwVisParams, 'Land cover 2016');
+Map.addLayer(lc_17, dwVisParams, 'Land cover 2017');
+Map.addLayer(lc_18, dwVisParams, 'Land cover 2018');
+Map.addLayer(lc_19, dwVisParams, 'Land cover 2019');
+Map.addLayer(lc_20, dwVisParams, 'Land cover 2020');
 
 
 // Border of wildfire - add to map
