@@ -66,19 +66,25 @@ Map.addLayer(lc_19, dwVisParams, 'LULC_2019');
 Map.addLayer(lc_20, dwVisParams, 'LULC_2020');
 
 
+// Border of wildfire - add to map
+Map.addLayer(ee.Image().byte().paint({
+  featureCollection: fires,
+  color: '000000',
+  width: 2}), {palette: '000000'}, 'Burned Areas Borders');
 
 
-Map.addLayer(fires, {}, "Fire shapefile");
-
-//Map.addLayer(tile);
-//Map.centerObject(tile, 5);
-//Crop Dynamic World to BC and AL
+//
+print(lc_16);
 
 
-//Decompose Dynamic World into annual images
+//Export an image 
 
 
-
-
-
-//Map annual images 
+Export.image.toDrive({
+  image: lc_17,
+  scale: 250,
+  description: 'LULC_2017',
+  fileFormat: 'GEOTIFF',
+  folder: "Canada_Fires_DW",  
+  maxPixels: 9e10
+});
