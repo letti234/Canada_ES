@@ -15,12 +15,11 @@ var roi =
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
 //Dynamic world data - Canadian wildfire areas
 
+  //Note that the polyon "roi" is a portion of BC affected by wildfire in 2018
+
 
 //Call on wildfire data for 2018
 var fires = ee.FeatureCollection('users/salem043/CAN_FIRES/nbac_2018_r9_20210810');
-//Map.addLayer(fires);
-
-//I use the wildfire data to clip to one ROI around several fires in BC in 2018
 
 
 //Call on Dynamic World clipped to ROI for different years based on summer imagery
@@ -52,13 +51,14 @@ var lc_20 = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
   .reduce(ee.Reducer.mode());
 
 
-//Visualization parameters
+//Visualization parameters for mapping
 
 var dwVisParams = {
   min: 0, max:8,
   palette: ['#419bdf', '#397d49', '#88b053', '#7a87c6', '#e49635', '#dfc35a', '#c4281b', '#a59b8f', '	#b39fe1']
-}
+};
 
+//Map LULC
 Map.addLayer(lc_16, dwVisParams, 'LULC_2016');
 Map.addLayer(lc_17, dwVisParams, 'LULC_2017');
 Map.addLayer(lc_18, dwVisParams, 'LULC_2018');
