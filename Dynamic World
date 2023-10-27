@@ -75,12 +75,10 @@ Map.addLayer(ee.Image().byte().paint({
   width: 2}), {palette: '000000'}, 'Burned Areas Borders');
 
 
-//
-print(lc_16);
+
 
 
 //Export an image 
-
 
 Export.image.toDrive({
   image: lc_17,
