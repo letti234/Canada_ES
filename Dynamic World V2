@@ -15,8 +15,13 @@ var roi =
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
 //Dynamic world data - Canadian wildfire areas
 
-  //Note that the polyon "roi" is a portion of BC affected by wildfire in 2018
-	826
+//Note that the polyon "roi" is a portion of BC affected by wildfire in 2018
+
+//If we want a BC polygon
+var BC = ee.FeatureCollection("FAO/GAUL/2015/level1")
+.filter(ee.Filter.eq("ADM1_CODE", 826));
+
+print(BC);
 
 //Call on wildfire data for 2018
 var fires = ee.FeatureCollection('users/salem043/CAN_FIRES/nbac_2018_r9_20210810');
