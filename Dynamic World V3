@@ -1,0 +1,96 @@
+/**** Start of imports. If edited, may not auto-convert in the playground. ****/
+var roi = 
+    /* color: #00ffff */
+    /* shown: false */
+    /* displayProperties: [
+      {
+        "type": "rectangle"
+      }
+    ] */
+    ee.Geometry.Polygon(
+        [[[-127.21509932701497, 54.45823658652432],
+          [-127.21509932701497, 53.600015089293215],
+          [-124.01807784263997, 53.600015089293215],
+          [-124.01807784263997, 54.45823658652432]]], null, false);
+/***** End of imports. If edited, may not auto-convert in the playground. *****/
+//Dynamic world data - Canadian wildfire areas
+
+//Note that the polyon "roi" is a portion of BC affected by wildfire in 2018
+
+//If we want a BC polygon
+var BC = ee.FeatureCollection("FAO/GAUL/2015/level1")
+.filter(ee.Filter.eq("ADM1_CODE", 826));
+
+print(BC);
+
+
+//Call on wildfire data for 2018
+var fires = ee.FeatureCollection('users/salem043/CAN_FIRES/nbac_2018_r9_20210810');
+
+
+//Call on Dynamic World clipped to ROI for different years based on summer imagery
+  //Takes mode of several layers to obtain composite of most likely classification.
+
+var lc_16 = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
+  .filterDate("2016-04-21", "2016-09-20")
+  .filterBounds(roi).select("label")
+  .reduce(ee.Reducer.mode());
+
+var lc_17 = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
+  .filterDate("2017-04-21", "2017-09-20")
+  .filterBounds(roi).select("label")
+  .reduce(ee.Reducer.mode());
+
+var lc_18 = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
+  .filterDate("2018-04-21", "2018-09-20")
+  .filterBounds(roi).select("label")
+  .reduce(ee.Reducer.mode());
+
+var lc_19 = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
+  .filterDate("2019-04-21", "2019-09-20")
+  .filterBounds(roi).select("label")
+  .reduce(ee.Reducer.mode());
+
+var lc_20 = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
+  .filterDate("2020-04-21", "2020-09-20")
+  .filterBounds(roi).select("label")
+  .reduce(ee.Reducer.mode());
+
+
+//Visualization parameters for mapping
+
+var dwVisParams = {
+  min: 0, max:8,
+  palette: ['#419bdf', '#397d49', '#88b053', '#7a87c6', '#e49635', '#dfc35a', '#c4281b', '#a59b8f', '	#b39fe1']
+};
+
+Map.centerObject(roi);
+
+//Map LULC
+Map.addLayer(lc_16, dwVisParams, 'Land cover 2016');
+Map.addLayer(lc_17, dwVisParams, 'Land cover 2017');
+Map.addLayer(lc_18, dwVisParams, 'Land cover 2018');
+Map.addLayer(lc_19, dwVisParams, 'Land cover 2019');
+Map.addLayer(lc_20, dwVisParams, 'Land cover 2020');
+
+
+// Border of wildfire - add to map
+Map.addLayer(ee.Image().byte().paint({
+  featureCollection: fires,
+  color: '000000',
+  width: 2}), {palette: '000000'}, 'Burned Areas Borders');
+
+
+
+
+
+//Export an image 
+
+Export.image.toDrive({
+  image: lc_17,
+  scale: 250,
+  description: 'LULC_2017',
+  fileFormat: 'GEOTIFF',
+  folder: "Canada_Fires_DW",  
+  maxPixels: 9e10
+});
