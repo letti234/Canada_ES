@@ -24,7 +24,7 @@ var roi = BC.filter(ee.Filter.eq("ADM2_NAME", "Thompson-Nicola"));
 //1 degree = 111.1 km
 //5 km = 0.0450045 degrees (roughly)
 
-var tiles = tile(roi, 0.0450045); //TURN BACK TO 0.01 deg!
+var tiles = tile(roi, 0.5); //TURN BACK TO 0.0450045
 
 function tile(region, size_in_degrees) {
   function tile_geometry(geometry) {
