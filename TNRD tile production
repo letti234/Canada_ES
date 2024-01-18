@@ -196,10 +196,6 @@ var grass = ee.Image(1)
       .where(lc.gt(7).and(lc.lte(8)),  0) //Snow/ice
       .clip(roi) ;
 
-//Visual inspection
-Map.addLayer(lc, dwVisParams, "DW 2017 LULC", 0);
-Map.addLayer(forest, forVisParams, "Grasslands cover", 0);
-
 
 //Pct FC per tile 2017
 var grass17 = forest17.map(function(feature) {
@@ -211,15 +207,61 @@ var grass17 = forest17.map(function(feature) {
   }));
 });
 
+
 //Variable stored as "constant". Change to a more useful name
 var grass17 = grass17.map(function(feat){
   return ee.Feature(feat.geometry(), { 
     grass_17: feat.get('constant'),
+    forest_17: feat.get('forest_17'),
   });
 });
 
 //Print to inspect - note the variable is stored as "constant"
-print(grass17.limit(5), "Tiles with percent grasslands");
+print(grass17.limit(5), "Tiles with percent grass, forest");
+
+
+
+
+/////////////////////////////////////////////////////////////////
+//
+// 2017 percent shrubland/scrubland cover for each tile
+//
+/////////////////////////////////////////////////////////////////
+
+var shrub = ee.Image(1)
+      .where(lc.gt(-1).and(lc.lte(0)), 0)  //Water
+      .where(lc.gt(0).and(lc.lte(1)),  0) //trees
+      .where(lc.gt(1).and(lc.lte(2)),  0) //grass
+      .where(lc.gt(2).and(lc.lte(3)),  0) //flooded veg
+      .where(lc.gt(3).and(lc.lte(4)),  0) //crops
+      .where(lc.gt(4).and(lc.lte(5)),  1) //shrub/scrub
+      .where(lc.gt(5).and(lc.lte(6)),  0) //Built
+      .where(lc.gt(6).and(lc.lte(7)),  0) //Bare
+      .where(lc.gt(7).and(lc.lte(8)),  0) //Snow/ice
+      .clip(roi) ;
+
+
+//Pct FC per tile 2017
+var shrub17 = grass17.map(function(feature) {
+  return feature.set(shrub.reduceRegion({
+    reducer: 'mean',
+    geometry: feature.geometry(),
+    scale: 10,
+    maxPixels: 1e9
+  }));
+});
+
+//Variable stored as "constant". Change to a more useful name
+var shrub17 = shrub17.map(function(feat){
+  return ee.Feature(feat.geometry(), { 
+    shrub_17: feat.get('constant'),
+    grass_17: feat.get('grass_17'),
+    forest_17: feat.get('forest_17'),
+  });
+});
+
+//Print to inspect - note the variable is stored as "constant"
+print(shrub17.limit(5), "Tiles with percent shrub, grass, forest");
 
 
 
