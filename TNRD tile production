@@ -202,7 +202,7 @@ Map.addLayer(forest, forVisParams, "Grasslands cover", 0);
 
 
 //Pct FC per tile 2017
-var grass17 = tiles.map(function(feature) {
+var grass17 = forest17.map(function(feature) {
   return feature.set(grass.reduceRegion({
     reducer: 'mean',
     geometry: feature.geometry(),
@@ -219,7 +219,7 @@ var grass17 = grass17.map(function(feat){
 });
 
 //Print to inspect - note the variable is stored as "constant"
-print(grass17.limit(10), "Tiles with percent grasslands");
+print(grass17.limit(5), "Tiles with percent grasslands");
 
 
 
