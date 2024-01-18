@@ -98,7 +98,7 @@ var forVisParams = {
 
 /////////////////////////////////////////////////////////////////
 //
-// 2017 percent forest cover for each tile
+// 2017 land cover composite
 //
 /////////////////////////////////////////////////////////////////
 
@@ -106,9 +106,15 @@ var forVisParams = {
 var lc = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
   .filterDate("2017-06-01", "2017-08-31")
   .filterBounds(roi).select("label")
-  .reduce(ee.Reducer.mode());
-  
-var lc = lc.clip(roi);
+  .reduce(ee.Reducer.mode()).clip(roi);
+
+
+/////////////////////////////////////////////////////////////////
+//
+// 2017 percent forest cover for each tile
+//
+/////////////////////////////////////////////////////////////////
+
 
 //Create a binary raster where 0 = nonforest, 1 = forest
 
@@ -129,12 +135,12 @@ var forest = ee.Image(1)
       .clip(roi) ;
 
 //Visual inspection
-Map.addLayer(lc, dwVisParams, "DW 2017 LULC", 0)
-Map.addLayer(forest, forVisParams, "Forest cover", 0)
+Map.addLayer(lc, dwVisParams, "DW 2017 LULC", 0);
+Map.addLayer(forest, forVisParams, "Forest cover", 0);
 
 
 //Pct FC per tile 2017
-var forest_17 = tiles.map(function(feature) {
+var forest17 = tiles.map(function(feature) {
   return feature.set(forest.reduceRegion({
     reducer: 'mean',
     geometry: feature.geometry(),
@@ -143,6 +149,61 @@ var forest_17 = tiles.map(function(feature) {
   }));
 });
 
-//Print to inspect - note the variable is stored as "constant"
-print(forest_17.limit(10));
+//Variable stored as "constant". Change to a more useful name
+var forest17 = forest17.map(function(feat){
+  return ee.Feature(feat.geometry(), { 
+    forest_17: feat.get('constant'),
+  });
+});
 
+//Print to inspect - note the variable is stored as "constant"
+print(forest17.limit(2), "Tiles with percent forest cover");
+
+
+
+/////////////////////////////////////////////////////////////////
+//
+// 2017 percent grasslands cover for each tile
+//
+/////////////////////////////////////////////////////////////////
+
+var grass = ee.Image(1)
+      .where(lc.gt(-1).and(lc.lte(0)), 0)  //Water
+      .where(lc.gt(0).and(lc.lte(1)),  0) //trees
+      .where(lc.gt(1).and(lc.lte(2)),  1) //grass
+      .where(lc.gt(2).and(lc.lte(3)),  0) //flooded veg
+      .where(lc.gt(3).and(lc.lte(4)),  0) //crops
+      .where(lc.gt(4).and(lc.lte(5)),  0) //shrub/scrub
+      .where(lc.gt(5).and(lc.lte(6)),  0) //Built
+      .where(lc.gt(6).and(lc.lte(7)),  0) //Bare
+      .where(lc.gt(7).and(lc.lte(8)),  0) //Snow/ice
+      .clip(roi) ;
+
+//Visual inspection
+Map.addLayer(lc, dwVisParams, "DW 2017 LULC", 0);
+Map.addLayer(forest, forVisParams, "Grasslands cover", 0);
+
+
+//Pct FC per tile 2017
+var grass17 = tiles.map(function(feature) {
+  return feature.set(grass.reduceRegion({
+    reducer: 'mean',
+    geometry: feature.geometry(),
+    scale: 10,
+    maxPixels: 1e9
+  }));
+});
+
+//Variable stored as "constant". Change to a more useful name
+var grass17 = grass17.map(function(feat){
+  return ee.Feature(feat.geometry(), { 
+    grass_17: feat.get('constant'),
+  });
+});
+
+//Print to inspect - note the variable is stored as "constant"
+print(grass17.limit(10), "Tiles with percent grasslands");
+
+var tiles17 = forest17.merge(grass17);
+
+print(tiles17.limit(3), "Merged pct forest and grasslands");
