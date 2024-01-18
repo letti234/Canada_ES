@@ -98,6 +98,23 @@ var forVisParams = {
 
 /////////////////////////////////////////////////////////////////
 //
+// Code for merging outputs of zonal statistics (means within tile)
+//
+/////////////////////////////////////////////////////////////////
+
+
+// Use an equals filter to specify how the collections match.
+var mergeFilter = ee.Filter.equals({
+  leftField: 'id',
+  rightField: 'id'
+});
+
+// Define the join.
+var innerJoin = ee.Join.inner();
+
+
+/////////////////////////////////////////////////////////////////
+//
 // 2017 land cover composite
 //
 /////////////////////////////////////////////////////////////////
@@ -204,6 +221,5 @@ var grass17 = grass17.map(function(feat){
 //Print to inspect - note the variable is stored as "constant"
 print(grass17.limit(10), "Tiles with percent grasslands");
 
-var tiles17 = forest17.merge(grass17);
 
-print(tiles17.limit(3), "Merged pct forest and grasslands");
+
