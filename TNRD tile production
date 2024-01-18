@@ -33,7 +33,7 @@ var roi = BC.filter(ee.Filter.eq("ADM2_NAME", "Thompson-Nicola"));
 
 //Develop code using very coarse grid-cells
 
-var tiles = tile(roi, 0.5); //TURN BACK TO 0.0450045
+var tiles = tile(roi, 0.0450045); //Train on 0.5, TURN BACK TO 0.0450045 for export
 
 function tile(region, size_in_degrees) {
   function tile_geometry(geometry) {
