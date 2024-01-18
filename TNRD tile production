@@ -1,0 +1,77 @@
+//Tabular data production - percent land cover by grid-cells in TNRD
+
+/////////////////////////////////////////////////////////////////
+//
+// Define our region of interest
+//
+/////////////////////////////////////////////////////////////////
+
+var BC = ee.FeatureCollection("FAO/GAUL/2015/level2")
+.filter(ee.Filter.eq("ADM1_CODE", 826));
+
+// Map.addLayer(BC);
+print(BC);
+
+var roi = BC.filter(ee.Filter.eq("ADM2_NAME", "Thompson-Nicola"));
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Create roughly 5km by 5km gridcells
+//
+/////////////////////////////////////////////////////////////////
+
+//1 degree = 111.1 km
+//5 km = 0.0450045 degrees (roughly)
+
+var tiles = tile(roi, 0.0450045); //TURN BACK TO 0.01 deg!
+
+function tile(region, size_in_degrees) {
+  function tile_geometry(geometry) {
+    var coords = ee.List(geometry.bounds().coordinates().get(0))
+    var min_point = ee.List(coords.get(0))
+    var max_point = ee.List(coords.get(2))
+  
+    function sequence(direction) {
+      var start = min_point.get(direction)  
+      var stop = ee.Number(max_point.get(direction))
+      return ee.List.sequence(start, stop, size_in_degrees)
+    }
+  
+    var tiles = sequence(0).map(function (x) {
+      return sequence(1).map(function (y) { 
+          return ee.Feature(ee.Geometry.Rectangle([
+            [ee.Number(x), ee.Number(y)],
+            [
+              ee.Number(x).add(size_in_degrees).min(max_point.get(0)),
+              ee.Number(y).add(size_in_degrees).min(max_point.get(1))
+            ]
+        ]).intersection(geometry, 30))
+      })
+  	}).flatten()
+    return ee.FeatureCollection(tiles).filterBounds(geometry)
+  }
+
+  function tile_feature_collection(feature_collection) {
+    return ee.FeatureCollection(
+      feature_collection.iterate(
+        function (feature, acc) {
+          return ee.FeatureCollection(acc).merge(tile_geometry(ee.Feature(feature).geometry()))
+        }, ee.FeatureCollection([]))
+    )
+  }
+
+  if (region instanceof ee.FeatureCollection)
+    return tile_feature_collection(region)
+  else if (region instanceof ee.Feature)
+    return tile_geometry(region.geometry())
+  else if (region instanceof ee.Geometry)
+    return tile_geometry(region)
+  else
+    throw Error(
+      'region must be ee.FeatureCollection, ee.Feature, or ee.Geometry. Was ' + region
+    )
+}
+
+Map.centerObject(tiles, 7);
+Map.addLayer(tiles, {}, "Sample tiles");
