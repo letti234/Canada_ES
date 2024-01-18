@@ -108,17 +108,24 @@ var lc = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
   .filterBounds(roi).select("label")
   .reduce(ee.Reducer.mode());
   
+var lc = lc.clip(roi);
+
 //Create a binary raster where 0 = nonforest, 1 = forest
+
+//Note: to change this classification for another land cover type, set 
+//forest as 0 in the last column and turn the value in that column to 1 for
+//a particular land cover type
+
 var forest = ee.Image(1)
       .where(lc.gt(-1).and(lc.lte(0)), 0)  //Water
-      .where(lc.gt(0).and(lc.lte(1)), 1) //trees
-      .where(lc.gt(1).and(lc.lte(2)), 0) //grass
-      .where(lc.gt(2).and(lc.lte(3)), 0) //flooded veg
-      .where(lc.gt(3).and(lc.lte(4)), 0) //crops
-      .where(lc.gt(4).and(lc.lte(5)), 0) //shrub/scrub
-      .where(lc.gt(5).and(lc.lte(6)), 0) //Built
-      .where(lc.gt(6).and(lc.lte(7)), 0) //Bare
-      .where(lc.gt(7).and(lc.lte(8)), 0) //Snow/ice
+      .where(lc.gt(0).and(lc.lte(1)),  1) //trees
+      .where(lc.gt(1).and(lc.lte(2)),  0) //grass
+      .where(lc.gt(2).and(lc.lte(3)),  0) //flooded veg
+      .where(lc.gt(3).and(lc.lte(4)),  0) //crops
+      .where(lc.gt(4).and(lc.lte(5)),  0) //shrub/scrub
+      .where(lc.gt(5).and(lc.lte(6)),  0) //Built
+      .where(lc.gt(6).and(lc.lte(7)),  0) //Bare
+      .where(lc.gt(7).and(lc.lte(8)),  0) //Snow/ice
       .clip(roi) ;
 
 //Visual inspection
@@ -136,5 +143,6 @@ var forest_17 = tiles.map(function(feature) {
   }));
 });
 
-//Print to inspect
-print(forest_17.first());
+//Print to inspect - note the variable is stored as "constant"
+print(forest_17.limit(10));
+
