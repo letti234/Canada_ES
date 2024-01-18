@@ -229,8 +229,6 @@ var grass17 = grass17.map(function(feat){
 print(grass17.limit(5), "Tiles with percent grass, forest");
 
 
-
-
 /////////////////////////////////////////////////////////////////
 //
 // 2017 percent shrubland/scrubland cover for each tile
@@ -273,4 +271,11 @@ var shrub17 = shrub17.map(function(feat){
 print(shrub17.limit(5), "Tiles with percent shrub, grass, forest");
 
 
+/////////////////////////////////////////////////////////////////
+//
+// Export 2017 information
+//
+/////////////////////////////////////////////////////////////////
+
+Export.table.toDrive(shrub17, "percent_vegcover_2017", "Canada_Fires_DW");
 
