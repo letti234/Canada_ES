@@ -6,14 +6,12 @@
 //
 /////////////////////////////////////////////////////////////////
 
+//BC shapefile with ADM 2
 var BC = ee.FeatureCollection("FAO/GAUL/2015/level2")
 .filter(ee.Filter.eq("ADM1_CODE", 826));
 
-// Map.addLayer(BC);
-print(BC);
-
+//Select TNRD (an ADM2 adminstrative division)
 var roi = BC.filter(ee.Filter.eq("ADM2_NAME", "Thompson-Nicola"));
-
 
 /////////////////////////////////////////////////////////////////
 //
@@ -23,6 +21,8 @@ var roi = BC.filter(ee.Filter.eq("ADM2_NAME", "Thompson-Nicola"));
 
 //1 degree = 111.1 km
 //5 km = 0.0450045 degrees (roughly)
+
+//Develop code using very coarse grid-cells
 
 var tiles = tile(roi, 0.5); //TURN BACK TO 0.0450045
 
@@ -75,3 +75,17 @@ function tile(region, size_in_degrees) {
 
 Map.centerObject(tiles, 7);
 Map.addLayer(tiles, {}, "Sample tiles");
+
+
+
+/////////////////////////////////////////////////////////////////
+//
+// 2017 percent land cover type for each gridcell
+//
+/////////////////////////////////////////////////////////////////
+
+//Time for composite: June and July
+var lc_16 = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
+  .filterDate("2017-06-01", "2016-08-31")
+  .filterBounds(roi).select("label")
+  .reduce(ee.Reducer.mode());
