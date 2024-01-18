@@ -1,5 +1,14 @@
 //Tabular data production - percent land cover by grid-cells in TNRD
 
+//Code divides the TNRD district into roughly 5km by 5km grid-cells ("tiles").
+//Code then takes Dynamic World 2017 composites, reclassifies the 
+//raster to get binary classification of forest, shrub, and grass lands
+//as separate maps, and compiles zonal statistics per tile. Code exports
+//The results as a tabular dataframe with the grid-cell ID, percent
+//forest cover, percent grassland, percent shrubland, and a geoJSON
+//spatial attribute we can use to recover the shapefile in R.
+
+
 /////////////////////////////////////////////////////////////////
 //
 // Define our region of interest
