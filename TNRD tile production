@@ -133,15 +133,15 @@ var lc = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
 //a particular land cover type
 
 var forest = ee.Image(1)
-      .where(lc.gt(-1).and(lc.lte(0)), 0)  //Water
-      .where(lc.gt(0).and(lc.lte(1)),  1) //trees
-      .where(lc.gt(1).and(lc.lte(2)),  0) //grass
-      .where(lc.gt(2).and(lc.lte(3)),  0) //flooded veg
-      .where(lc.gt(3).and(lc.lte(4)),  0) //crops
-      .where(lc.gt(4).and(lc.lte(5)),  0) //shrub/scrub
-      .where(lc.gt(5).and(lc.lte(6)),  0) //Built
-      .where(lc.gt(6).and(lc.lte(7)),  0) //Bare
-      .where(lc.gt(7).and(lc.lte(8)),  0) //Snow/ice
+      .where(lc.gt(-1).and(lc.lte(0)), 0)  //Water v= 0
+      .where(lc.gt(0).and(lc.lte(1)),  1) //trees = 1
+      .where(lc.gt(1).and(lc.lte(2)),  0) //grass = 2
+      .where(lc.gt(2).and(lc.lte(3)),  0) //flooded veg = 3
+      .where(lc.gt(3).and(lc.lte(4)),  0) //crops = 4
+      .where(lc.gt(4).and(lc.lte(5)),  0) //shrub/scrub = 5
+      .where(lc.gt(5).and(lc.lte(6)),  0) //Built = 6
+      .where(lc.gt(6).and(lc.lte(7)),  0) //Bare = 7
+      .where(lc.gt(7).and(lc.lte(8)),  0) //Snow/ice = 8
       .clip(roi) ;
 
 //Visual inspection
@@ -159,12 +159,14 @@ var forest17 = tiles.map(function(feature) {
   }));
 });
 
+
 //Variable stored as "constant". Change to a more useful name
 var forest17 = forest17.map(function(feat){
   return ee.Feature(feat.geometry(), { 
     forest_17: feat.get('constant'),
   });
 });
+
 
 //Print to inspect - note the variable is stored as "constant"
 print(forest17.limit(2), "Tiles with percent forest cover");
