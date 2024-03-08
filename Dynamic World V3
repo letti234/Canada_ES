@@ -1,27 +1,15 @@
-/**** Start of imports. If edited, may not auto-convert in the playground. ****/
-var roi = 
-    /* color: #00ffff */
-    /* shown: false */
-    /* displayProperties: [
-      {
-        "type": "rectangle"
-      }
-    ] */
-    ee.Geometry.Polygon(
-        [[[-127.21509932701497, 54.45823658652432],
-          [-127.21509932701497, 53.600015089293215],
-          [-124.01807784263997, 53.600015089293215],
-          [-124.01807784263997, 54.45823658652432]]], null, false);
-/***** End of imports. If edited, may not auto-convert in the playground. *****/
 //Dynamic world data - Canadian wildfire areas
 
 //Note that the polyon "roi" is a portion of BC affected by wildfire in 2018
 
 //If we want a BC polygon
-var BC = ee.FeatureCollection("FAO/GAUL/2015/level1")
+//BC shapefile with ADM 2
+var BC = ee.FeatureCollection("FAO/GAUL/2015/level2")
 .filter(ee.Filter.eq("ADM1_CODE", 826));
 
-print(BC);
+//Select TNRD (an ADM2 adminstrative division)
+var roi = BC.filter(ee.Filter.eq("ADM2_NAME", "Thompson-Nicola"));
+
 
 
 //Call on wildfire data for 2018
@@ -34,27 +22,27 @@ var fires = ee.FeatureCollection('users/salem043/CAN_FIRES/nbac_2018_r9_20210810
 var lc_16 = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
   .filterDate("2016-04-21", "2016-09-20")
   .filterBounds(roi).select("label")
-  .reduce(ee.Reducer.mode());
+  .reduce(ee.Reducer.mode()).clip(roi);
 
 var lc_17 = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
   .filterDate("2017-04-21", "2017-09-20")
   .filterBounds(roi).select("label")
-  .reduce(ee.Reducer.mode());
+  .reduce(ee.Reducer.mode()).clip(roi);
 
 var lc_18 = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
   .filterDate("2018-04-21", "2018-09-20")
   .filterBounds(roi).select("label")
-  .reduce(ee.Reducer.mode());
+  .reduce(ee.Reducer.mode()).clip(roi);
 
 var lc_19 = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
   .filterDate("2019-04-21", "2019-09-20")
   .filterBounds(roi).select("label")
-  .reduce(ee.Reducer.mode());
+  .reduce(ee.Reducer.mode()).clip(roi);
 
 var lc_20 = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
   .filterDate("2020-04-21", "2020-09-20")
   .filterBounds(roi).select("label")
-  .reduce(ee.Reducer.mode());
+  .reduce(ee.Reducer.mode()).clip(roi);
 
 
 //Visualization parameters for mapping
