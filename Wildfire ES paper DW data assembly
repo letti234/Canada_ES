@@ -1,0 +1,267 @@
+//Tabular data production - percent land cover by grid-cells in TNRD
+
+//Code divides the TNRD district into roughly 5km by 5km grid-cells ("tiles").
+//Code then takes Dynamic World 2017 composites, reclassifies the 
+//raster to get binary classification of forest, shrub, and grass lands
+//as separate maps, and compiles zonal statistics per tile. Code exports
+//The results as a tabular dataframe with the grid-cell ID, percent
+//forest cover, percent grassland, percent shrubland, and a geoJSON
+//spatial attribute we can use to recover the shapefile in R.
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Define our region of interest
+//
+/////////////////////////////////////////////////////////////////
+
+//BC shapefile with ADM 2
+var BC = ee.FeatureCollection("FAO/GAUL/2015/level2")
+.filter(ee.Filter.eq("ADM1_CODE", 826));
+
+//Select TNRD (an ADM2 adminstrative division)
+var roi = BC.filter(ee.Filter.eq("ADM2_NAME", "Thompson-Nicola"));
+
+/////////////////////////////////////////////////////////////////
+//
+// Create 1 degree gridcells
+//
+/////////////////////////////////////////////////////////////////
+
+//1 degree = 111.1 km
+//5 km = 0.0450045 degrees (roughly)
+
+//Develop code using very coarse grid-cells
+
+var tiles = tile(roi, 1); //1 degree grid cells
+
+function tile(region, size_in_degrees) {
+  function tile_geometry(geometry) {
+    var coords = ee.List(geometry.bounds().coordinates().get(0))
+    var min_point = ee.List(coords.get(0))
+    var max_point = ee.List(coords.get(2))
+  
+    function sequence(direction) {
+      var start = min_point.get(direction)  
+      var stop = ee.Number(max_point.get(direction))
+      return ee.List.sequence(start, stop, size_in_degrees)
+    }
+  
+    var tiles = sequence(0).map(function (x) {
+      return sequence(1).map(function (y) { 
+          return ee.Feature(ee.Geometry.Rectangle([
+            [ee.Number(x), ee.Number(y)],
+            [
+              ee.Number(x).add(size_in_degrees).min(max_point.get(0)),
+              ee.Number(y).add(size_in_degrees).min(max_point.get(1))
+            ]
+        ]).intersection(geometry, 30))
+      })
+  	}).flatten()
+    return ee.FeatureCollection(tiles).filterBounds(geometry)
+  }
+
+  function tile_feature_collection(feature_collection) {
+    return ee.FeatureCollection(
+      feature_collection.iterate(
+        function (feature, acc) {
+          return ee.FeatureCollection(acc).merge(tile_geometry(ee.Feature(feature).geometry()))
+        }, ee.FeatureCollection([]))
+    )
+  }
+
+  if (region instanceof ee.FeatureCollection)
+    return tile_feature_collection(region)
+  else if (region instanceof ee.Feature)
+    return tile_geometry(region.geometry())
+  else if (region instanceof ee.Geometry)
+    return tile_geometry(region)
+  else
+    throw Error(
+      'region must be ee.FeatureCollection, ee.Feature, or ee.Geometry. Was ' + region
+    )
+}
+
+Map.centerObject(tiles, 7);
+Map.addLayer(tiles, {}, "Sample tiles");
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Color palette for mapping DW data
+//
+/////////////////////////////////////////////////////////////////
+
+
+var dwVisParams = {
+  min: 0, max:8,
+  palette: ['#419bdf', '#397d49', '#88b053', '#7a87c6', '#e49635', '#dfc35a', '#c4281b', '#a59b8f', '	#b39fe1']
+};
+
+var forVisParams = {
+  palette: ['FFFFFF', '00FF00'], // White for 0, Green for 1
+  min: 0,
+  max: 1,
+};
+
+
+
+/////////////////////////////////////////////////////////////////
+//
+// 2017 land cover composite
+//
+/////////////////////////////////////////////////////////////////
+
+//Time for composite: June and July
+var lc = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
+  .filterDate("2017-06-01", "2017-08-31")
+  .filterBounds(roi).select("label")
+  .reduce(ee.Reducer.mode()).clip(roi);
+
+
+/////////////////////////////////////////////////////////////////
+//
+// 2017 percent forest cover for each tile
+//
+/////////////////////////////////////////////////////////////////
+
+
+//Create a binary raster where 0 = nonforest, 1 = forest
+
+//Note: to change this classification for another land cover type, set 
+//forest as 0 in the last column and turn the value in that column to 1 for
+//a particular land cover type
+
+var forest = ee.Image(1)
+      .where(lc.gt(-1).and(lc.lte(0)), 0)  //Water v= 0
+      .where(lc.gt(0).and(lc.lte(1)),  1) //trees = 1
+      .where(lc.gt(1).and(lc.lte(2)),  0) //grass = 2
+      .where(lc.gt(2).and(lc.lte(3)),  0) //flooded veg = 3
+      .where(lc.gt(3).and(lc.lte(4)),  0) //crops = 4
+      .where(lc.gt(4).and(lc.lte(5)),  0) //shrub/scrub = 5
+      .where(lc.gt(5).and(lc.lte(6)),  0) //Built = 6
+      .where(lc.gt(6).and(lc.lte(7)),  0) //Bare = 7
+      .where(lc.gt(7).and(lc.lte(8)),  0) //Snow/ice = 8
+      .clip(roi) ;
+
+//Visual inspection
+Map.addLayer(lc, dwVisParams, "DW 2017 LULC", 0);
+Map.addLayer(forest, forVisParams, "Forest cover", 0);
+
+
+//Pct FC per tile 2017
+var forest17 = tiles.map(function(feature) {
+  return feature.set(forest.reduceRegion({
+    reducer: 'mean',
+    geometry: feature.geometry(),
+    scale: 10,
+    maxPixels: 1e9
+  }));
+});
+
+
+//Variable stored as "constant". Change to a more useful name
+var forest17 = forest17.map(function(feat){
+  return ee.Feature(feat.geometry(), { 
+    forest_17: feat.get('constant'),
+  });
+});
+
+
+//Print to inspect - note the variable is stored as "constant"
+print(forest17.limit(2), "Tiles with percent forest cover");
+
+
+
+/////////////////////////////////////////////////////////////////
+//
+// 2017 percent grasslands cover for each tile
+//
+/////////////////////////////////////////////////////////////////
+
+var grass = ee.Image(1)
+      .where(lc.gt(-1).and(lc.lte(0)), 0)  //Water
+      .where(lc.gt(0).and(lc.lte(1)),  0) //trees
+      .where(lc.gt(1).and(lc.lte(2)),  1) //grass
+      .where(lc.gt(2).and(lc.lte(3)),  0) //flooded veg
+      .where(lc.gt(3).and(lc.lte(4)),  0) //crops
+      .where(lc.gt(4).and(lc.lte(5)),  0) //shrub/scrub
+      .where(lc.gt(5).and(lc.lte(6)),  0) //Built
+      .where(lc.gt(6).and(lc.lte(7)),  0) //Bare
+      .where(lc.gt(7).and(lc.lte(8)),  0) //Snow/ice
+      .clip(roi) ;
+
+
+//Pct FC per tile 2017
+var grass17 = forest17.map(function(feature) {
+  return feature.set(grass.reduceRegion({
+    reducer: 'mean',
+    geometry: feature.geometry(),
+    scale: 10,
+    maxPixels: 1e9
+  }));
+});
+
+
+//Variable stored as "constant". Change to a more useful name
+var grass17 = grass17.map(function(feat){
+  return ee.Feature(feat.geometry(), { 
+    grass_17: feat.get('constant'),
+    forest_17: feat.get('forest_17'),
+  });
+});
+
+//Print to inspect - note the variable is stored as "constant"
+print(grass17.limit(5), "Tiles with percent grass, forest");
+
+
+/////////////////////////////////////////////////////////////////
+//
+// 2017 percent shrubland/scrubland cover for each tile
+//
+/////////////////////////////////////////////////////////////////
+
+var shrub = ee.Image(1)
+      .where(lc.gt(-1).and(lc.lte(0)), 0)  //Water
+      .where(lc.gt(0).and(lc.lte(1)),  0) //trees
+      .where(lc.gt(1).and(lc.lte(2)),  0) //grass
+      .where(lc.gt(2).and(lc.lte(3)),  0) //flooded veg
+      .where(lc.gt(3).and(lc.lte(4)),  0) //crops
+      .where(lc.gt(4).and(lc.lte(5)),  1) //shrub/scrub
+      .where(lc.gt(5).and(lc.lte(6)),  0) //Built
+      .where(lc.gt(6).and(lc.lte(7)),  0) //Bare
+      .where(lc.gt(7).and(lc.lte(8)),  0) //Snow/ice
+      .clip(roi) ;
+
+
+//Pct FC per tile 2017
+var shrub17 = grass17.map(function(feature) {
+  return feature.set(shrub.reduceRegion({
+    reducer: 'mean',
+    geometry: feature.geometry(),
+    scale: 10,
+    maxPixels: 1e9
+  }));
+});
+
+//Variable stored as "constant". Change to a more useful name
+var shrub17 = shrub17.map(function(feat){
+  return ee.Feature(feat.geometry(), { 
+    shrub_17: feat.get('constant'),
+    grass_17: feat.get('grass_17'),
+    forest_17: feat.get('forest_17'),
+  });
+});
+
+//Print to inspect - note the variable is stored as "constant"
+print(shrub17.limit(5), "Tiles with percent shrub, grass, forest");
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Export 2017 information
+//
+/////////////////////////////////////////////////////////////////
+
+Export.table.toDrive(shrub17, "percent_vegcover_2017", "Canada_Fires_DW");
+
