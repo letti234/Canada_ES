@@ -32,7 +32,7 @@ var yMax = 60;
 
 // Construct a rectangle from a list of GeoJSON 'point' formatted coordinates.
 var bbox = ee.Geometry.BBox(xMin, yMin, xMax, yMax);
-
+var bbox = ee.Feature(bbox);
 Map.addLayer(bbox, {}, "Box for cropping", 0);
 
 /////////////////////////////////////////////////////////////////
@@ -42,11 +42,8 @@ Map.addLayer(bbox, {}, "Box for cropping", 0);
 /////////////////////////////////////////////////////////////////
 
 var roiGeo = roi.geometry();
+var roiFeat = ee.Feature(roiGeo);
 
-var roiFeat = ee.Feature(ee.Geometry(roiGeo);
+var studyArea = roiGeo.intersection(bbox);
 
-
-
-var roiF = roiGeo.feature();
-
-
+Map.
