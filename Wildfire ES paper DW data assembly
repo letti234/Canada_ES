@@ -41,9 +41,11 @@ Map.addLayer(bbox, {}, "Box for cropping", 0);
 //
 /////////////////////////////////////////////////////////////////
 
+//Feature collection to geometry to feature
 var roiGeo = roi.geometry();
 var roiFeat = ee.Feature(roiGeo);
 
+//Intersection of Canada and bbox
 var studyArea = roiGeo.intersection(bbox);
 
-Map.
+Map.addLayer(studyArea);
