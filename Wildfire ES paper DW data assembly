@@ -40,3 +40,13 @@ Map.addLayer(bbox, {}, "Box for cropping", 0);
 // Crop Canada Feature Collection to bounding box
 //
 /////////////////////////////////////////////////////////////////
+
+var roiGeo = roi.geometry();
+
+var roiFeat = ee.Feature(ee.Geometry(roiGeo);
+
+
+
+var roiF = roiGeo.feature();
+
+
