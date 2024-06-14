@@ -16,7 +16,7 @@ var roi = ee.FeatureCollection("FAO/GAUL/2015/level0")
 .filter(ee.Filter.eq("ADM0_NAME", "Canada"));
 
 Map.addLayer(roi, {}, "All of Canada", 0);
-print(roi.limit(2));
+
 
 /////////////////////////////////////////////////////////////////
 //
