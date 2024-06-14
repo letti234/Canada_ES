@@ -15,7 +15,8 @@ var BC = ee.FeatureCollection("FAO/GAUL/2015/level2")
 var roi = ee.FeatureCollection("FAO/GAUL/2015/level0")
 .filter(ee.Filter.eq("ADM0_NAME", "Canada"));
 
-Map.addLayer(roi);
+Map.addLayer(roi, {}, "All of Canada", 0);
+print(roi.limit(2));
 
 /////////////////////////////////////////////////////////////////
 //
@@ -32,7 +33,7 @@ var yMax = 60;
 // Construct a rectangle from a list of GeoJSON 'point' formatted coordinates.
 var bbox = ee.Geometry.BBox(xMin, yMin, xMax, yMax);
 
-Map.addLayer(bbox);
+Map.addLayer(bbox, {}, "Box for cropping", 0);
 
 /////////////////////////////////////////////////////////////////
 //
