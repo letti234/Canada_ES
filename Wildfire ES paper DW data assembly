@@ -1,3 +1,17 @@
+/**** Start of imports. If edited, may not auto-convert in the playground. ****/
+var geometry = 
+    /* color: #98ff00 */
+    /* displayProperties: [
+      {
+        "type": "rectangle"
+      }
+    ] */
+    ee.Geometry.Polygon(
+        [[[-144.07269555969006, 60.01459227949658],
+          [-144.07269555969006, 38.08996696201456],
+          [-50.20550805969006, 38.08996696201456],
+          [-50.20550805969006, 60.01459227949658]]], null, false);
+/***** End of imports. If edited, may not auto-convert in the playground. *****/
 //Tabular data production - percent land cover by grid-cells in TNRD
 
 //Code divides the TNRD district into roughly 5km by 5km grid-cells ("tiles").
@@ -27,64 +41,23 @@ Map.addLayer(roi);
 
 /////////////////////////////////////////////////////////////////
 //
-// Create 1 degree gridcells
+// Create bounding box at 60th parallel
 //
 /////////////////////////////////////////////////////////////////
 
-//1 degree = 111.1 km
-//5 km = 0.0450045 degrees (roughly)
+// Coordinates for the bounds of a rectangle. We can easily modify
+var xMin = -144;
+var yMin = 38;
+var xMax = -50;
+var yMax = 60;
 
-//Develop code using very coarse grid-cells
+// Construct a rectangle from a list of GeoJSON 'point' formatted coordinates.
+var bbox = ee.Geometry.BBox(xMin, yMin, xMax, yMax);
 
-var tiles = tile(roi, 1); //1 degree grid cells
+Map.addLayer(bbox);
 
-function tile(region, size_in_degrees) {
-  function tile_geometry(geometry) {
-    var coords = ee.List(geometry.bounds().coordinates().get(0))
-    var min_point = ee.List(coords.get(0))
-    var max_point = ee.List(coords.get(2))
-  
-    function sequence(direction) {
-      var start = min_point.get(direction)  
-      var stop = ee.Number(max_point.get(direction))
-      return ee.List.sequence(start, stop, size_in_degrees)
-    }
-  
-    var tiles = sequence(0).map(function (x) {
-      return sequence(1).map(function (y) { 
-          return ee.Feature(ee.Geometry.Rectangle([
-            [ee.Number(x), ee.Number(y)],
-            [
-              ee.Number(x).add(size_in_degrees).min(max_point.get(0)),
-              ee.Number(y).add(size_in_degrees).min(max_point.get(1))
-            ]
-        ]).intersection(geometry, 30))
-      })
-  	}).flatten()
-    return ee.FeatureCollection(tiles).filterBounds(geometry)
-  }
-
-  function tile_feature_collection(feature_collection) {
-    return ee.FeatureCollection(
-      feature_collection.iterate(
-        function (feature, acc) {
-          return ee.FeatureCollection(acc).merge(tile_geometry(ee.Feature(feature).geometry()))
-        }, ee.FeatureCollection([]))
-    )
-  }
-
-  if (region instanceof ee.FeatureCollection)
-    return tile_feature_collection(region)
-  else if (region instanceof ee.Feature)
-    return tile_geometry(region.geometry())
-  else if (region instanceof ee.Geometry)
-    return tile_geometry(region)
-  else
-    throw Error(
-      'region must be ee.FeatureCollection, ee.Feature, or ee.Geometry. Was ' + region
-    )
-}
-
-Map.centerObject(tiles, 7);
-Map.addLayer(tiles, {}, "Sample tiles");
-
+/////////////////////////////////////////////////////////////////
+//
+// Crop Canada Feature Collection to bounding box
+//
+/////////////////////////////////////////////////////////////////
