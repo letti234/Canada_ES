@@ -1,26 +1,4 @@
-/**** Start of imports. If edited, may not auto-convert in the playground. ****/
-var geometry = 
-    /* color: #98ff00 */
-    /* displayProperties: [
-      {
-        "type": "rectangle"
-      }
-    ] */
-    ee.Geometry.Polygon(
-        [[[-144.07269555969006, 60.01459227949658],
-          [-144.07269555969006, 38.08996696201456],
-          [-50.20550805969006, 38.08996696201456],
-          [-50.20550805969006, 60.01459227949658]]], null, false);
-/***** End of imports. If edited, may not auto-convert in the playground. *****/
 //Tabular data production - percent land cover by grid-cells in TNRD
-
-//Code divides the TNRD district into roughly 5km by 5km grid-cells ("tiles").
-//Code then takes Dynamic World 2017 composites, reclassifies the 
-//raster to get binary classification of forest, shrub, and grass lands
-//as separate maps, and compiles zonal statistics per tile. Code exports
-//The results as a tabular dataframe with the grid-cell ID, percent
-//forest cover, percent grassland, percent shrubland, and a geoJSON
-//spatial attribute we can use to recover the shapefile in R.
 
 
 /////////////////////////////////////////////////////////////////
@@ -47,7 +25,7 @@ Map.addLayer(roi);
 
 // Coordinates for the bounds of a rectangle. We can easily modify
 var xMin = -144;
-var yMin = 38;
+var yMin = 40;
 var xMax = -50;
 var yMax = 60;
 
