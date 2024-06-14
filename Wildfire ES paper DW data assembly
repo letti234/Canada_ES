@@ -48,7 +48,6 @@ var roiFeat = ee.Feature(roiGeo);
 //Intersection of Canada and bbox
 var studyArea = roiGeo.intersection(bbox);
 
-Map.addLayer(studyArea);
 
 //The resulting object is too large to map :,(
 
@@ -108,6 +107,5 @@ function tile(region, size_in_degrees) {
     )
 }
 
-Map.centerObject(tiles, 7);
-Map.addLayer(tiles, {}, "Sample tiles");
-
+//Attempt to map a subset
+print(tiles.limit(1));
