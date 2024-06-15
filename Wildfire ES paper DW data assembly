@@ -8,57 +8,29 @@
 /////////////////////////////////////////////////////////////////
 
 //BC shapefile with ADM 2
-var BC = ee.FeatureCollection("FAO/GAUL/2015/level2")
+var roi = ee.FeatureCollection("FAO/GAUL/2015/level1")
 .filter(ee.Filter.eq("ADM1_CODE", 826));
 
-//Select all of Canada
-var roi = ee.FeatureCollection("FAO/GAUL/2015/level0")
-.filter(ee.Filter.eq("ADM0_NAME", "Canada"));
-
-Map.addLayer(roi, {}, "All of Canada", 0);
+Map.addLayer(roi, {}, "BC", 0);
 
 
 /////////////////////////////////////////////////////////////////
 //
-// Create bounding box at 60th parallel
-//
-/////////////////////////////////////////////////////////////////
-
-// Coordinates for the bounds of a rectangle. We can easily modify
-var xMin = -144;
-var yMin = 40;
-var xMax = -50;
-var yMax = 60;
-
-// Construct a rectangle from a list of GeoJSON 'point' formatted coordinates.
-var bbox = ee.Geometry.BBox(xMin, yMin, xMax, yMax);
-var bbox = ee.Feature(bbox);
-Map.addLayer(bbox, {}, "Box for cropping", 0);
-
-/////////////////////////////////////////////////////////////////
-//
-// Crop Canada Feature Collection to bounding box
-//
-/////////////////////////////////////////////////////////////////
-
-//Feature collection to geometry to feature
-var roiGeo = roi.geometry();
-var roiFeat = ee.Feature(roiGeo);
-
-//Intersection of Canada and bbox
-var studyArea = roiGeo.intersection(bbox);
-
-
-//The resulting object is too large to map :,(
-
-/////////////////////////////////////////////////////////////////
-//
-// Create 1 degree sample grids
+// 1 degree grid-cells
 //
 /////////////////////////////////////////////////////////////////
 
 
-var tiles = tile(studyArea, 1);
+/////////////////////////////////////////////////////////////////
+//
+// Create 1 degree grid-cells
+//
+/////////////////////////////////////////////////////////////////
+
+
+//Develop code using very coarse grid-cells
+
+var tiles = tile(roi, 1); 
 
 function tile(region, size_in_degrees) {
   function tile_geometry(geometry) {
@@ -107,5 +79,9 @@ function tile(region, size_in_degrees) {
     )
 }
 
-//Attempt to map a subset
-print(tiles.limit(1));
+Map.centerObject(tiles, 7);
+Map.addLayer(tiles, {}, "Sample tiles");
+
+
+
+
