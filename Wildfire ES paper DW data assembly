@@ -85,7 +85,7 @@ function tile(region, size_in_degrees) {
     )
 }
 
-//Attempt to map one tile
+//Mapping of tiles
 
 Map.addLayer(tiles, {color: "green"}, "Sample tiles", 0);
 
