@@ -27,11 +27,12 @@ var bbox = ee.Geometry.BBox(-140, 41, -52, 60);
 Map.addLayer(bbox, {color: "red"}, "Bounding box area", 0); print("Bounding box properties", bbox);
 
 var bboxGeo = ee.Geometry(bbox);
-// /////////////////////////////////////////////////////////////////
-// //
-// // Create 1 degree grid-cells
-// //
-// /////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////
+//
+// Create 1 degree grid-cells
+//
+/////////////////////////////////////////////////////////////////
 
 
 //Develop code using very coarse grid-cells
@@ -88,53 +89,30 @@ function tile(region, size_in_degrees) {
 //Mapping of tiles
 
 Map.addLayer(tiles, {color: "green"}, "Sample tiles", 0);
-print(tiles.limit(2));
-
 
 /////////////////////////////////////////////////////////////////
 //
-// Spatial intersection - subset to tiles that overlap Canada
+// Dynamic World composites
 //
 /////////////////////////////////////////////////////////////////
 
-//Simplified geometry object
-var Canada= ee.FeatureCollection("FAO/GAUL/2015/level0")
-.filter(ee.Filter.eq("ADM0_NAME", "Canada")).geometry().simplify(1000000);
-
-// //Transform this object into a feature
-// var CanadaFeat = ee.Feature(ee.Geometry(Canada));
-
-
-// //Find centroids of each tile
-// var getCentroid = function(feature) {
-//   var keepProperties = ['id'];
-//   var centroid = feature.geometry().centroid();
-//   return ee.Feature(centroid).copyProperties(feature, keepProperties);
-// };
-
-// var centroids = tiles.map(getCentroid);
-// print(centroids.limit(2));
-
-// //Spatial filter for intersecting geometries
-
-// var spatialFilter = ee.Filter.intersects({
-//   leftField: '.geo',
-//   rightField: '.geo'
-// });
-
-// var sample  = ee.Join.saveAll('matched').apply(centroids, CanadaFeat, spatialFilter);
-
-// Map.addLayer(sample.limit(2));
+var DW = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
+.map(function(image){return image.clip(tiles)})
+.select("label");
 
 
 
+//Modal composite 2016-2023 - suppose we use summer imagery 
+function yearly_filter(year){
+  
+  var modal_image = DW
+       .filterDate(year.toString()+'-06-01',year.toString()+'-08-31')
+       .reduce(ee.Reducer.mode());
+  
+  return modal_image
+  
+}
 
-// for more than one region (type: featureCollection), do something like:
-var tilesGeom = tiles.map(function(f) {
-  return f.geometry();
-});
+var dw_2016 = yearly_filter(2016);
 
-// Now map over your study sites and use intersect to clip them on the region(s)
-var sampleTilesGeom = tilesGeom.map(function(f) {
-  return f.intersection(Canada, 1); //1 refers to the maxError argument
-});
+Map.add
