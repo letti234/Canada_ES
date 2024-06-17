@@ -98,3 +98,8 @@ Map.addLayer(tiles, {color: "green"}, "Sample tiles", 0);
 //
 /////////////////////////////////////////////////////////////////
 
+var Canada= ee.FeatureCollection("FAO/GAUL/2015/level0")
+.filter(ee.Filter.eq("ADM0_NAME", "Canada"));
+
+var CanadaSimp = Canada.geometry().simplify(10000);
+Map.addLayer(CanadaSimp, {col: "purple"}, "All of Canada Simplified", 0);
