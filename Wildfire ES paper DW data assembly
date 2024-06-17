@@ -88,8 +88,7 @@ function tile(region, size_in_degrees) {
 //Mapping of tiles
 
 Map.addLayer(tiles, {color: "green"}, "Sample tiles", 0);
-
-
+print(tiles.limit(2));
 
 
 /////////////////////////////////////////////////////////////////
@@ -98,8 +97,44 @@ Map.addLayer(tiles, {color: "green"}, "Sample tiles", 0);
 //
 /////////////////////////////////////////////////////////////////
 
+//Simplified geometry object
 var Canada= ee.FeatureCollection("FAO/GAUL/2015/level0")
-.filter(ee.Filter.eq("ADM0_NAME", "Canada"));
+.filter(ee.Filter.eq("ADM0_NAME", "Canada")).geometry().simplify(1000000);
 
-var CanadaSimp = Canada.geometry().simplify(1000000);
-Map.addLayer(CanadaSimp, {col: "purple"}, "All of Canada Simplified", 0);
+// //Transform this object into a feature
+// var CanadaFeat = ee.Feature(ee.Geometry(Canada));
+
+
+// //Find centroids of each tile
+// var getCentroid = function(feature) {
+//   var keepProperties = ['id'];
+//   var centroid = feature.geometry().centroid();
+//   return ee.Feature(centroid).copyProperties(feature, keepProperties);
+// };
+
+// var centroids = tiles.map(getCentroid);
+// print(centroids.limit(2));
+
+// //Spatial filter for intersecting geometries
+
+// var spatialFilter = ee.Filter.intersects({
+//   leftField: '.geo',
+//   rightField: '.geo'
+// });
+
+// var sample  = ee.Join.saveAll('matched').apply(centroids, CanadaFeat, spatialFilter);
+
+// Map.addLayer(sample.limit(2));
+
+
+
+
+// for more than one region (type: featureCollection), do something like:
+var tilesGeom = tiles.map(function(f) {
+  return f.geometry();
+});
+
+// Now map over your study sites and use intersect to clip them on the region(s)
+var sampleTilesGeom = tilesGeom.map(function(f) {
+  return f.intersection(Canada, 1); //1 refers to the maxError argument
+});
