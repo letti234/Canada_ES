@@ -16,13 +16,9 @@ Map.addLayer(roi, {}, "BC", 0);
 //Simplify the geography a bunch
 
 //First turn into a geography object
-var roiGeo = roi.geometry().simplify(10000)
+var roiGeo = roi.geometry().simplify(100000);
 
-/////////////////////////////////////////////////////////////////
-//
-// 1 degree grid-cells
-//
-/////////////////////////////////////////////////////////////////
+Map.addLayer(roiGeo);
 
 
 /////////////////////////////////////////////////////////////////
@@ -83,8 +79,9 @@ function tile(region, size_in_degrees) {
     )
 }
 
-Map.centerObject(tiles, 7);
-Map.addLayer(tiles, {}, "Sample tiles");
+//Attempt to map one tile
+
+Map.addLayer(tiles.limit(1), {}, "Sample tiles");
 
 
 
