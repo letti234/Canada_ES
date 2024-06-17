@@ -98,7 +98,7 @@ Map.addLayer(tiles, {color: "green"}, "Sample tiles", 0);
 
 var DW = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
 .map(function(image){return image.clip(tiles)})
-.select("label");
+.select("label").filterBounds(tiles);
 
 
 
@@ -108,11 +108,16 @@ function yearly_filter(year){
   var modal_image = DW
        .filterDate(year.toString()+'-06-01',year.toString()+'-08-31')
        .reduce(ee.Reducer.mode());
-  
-  return modal_image
+
+  return modal_image;
   
 }
 
 var dw_2016 = yearly_filter(2016);
-
-Map.add
+var dw_2017 = yearly_filter(2017);
+var dw_2018 = yearly_filter(2018);
+var dw_2019 = yearly_filter(2019);
+var dw_2016 = yearly_filter(2020);
+var dw_2017 = yearly_filter(2021);
+var dw_2018 = yearly_filter(2022);
+var dw_2019 = yearly_filter(2023);
