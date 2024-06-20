@@ -138,6 +138,38 @@ return forest;
 /////////////////////////////////////////////////////////////////
 
 
+function zonalStatMaker(mapObj) {
+  
+//Calculate zonal stats
+var zonalStat = tiles.map(function(feature) {
+  return feature.set(mapObj.reduceRegion({
+    reducer: 'mean',
+    geometry: feature.geometry(),
+    scale: 10,
+    maxPixels: 1e9
+  }));
+});
+
+//Rename variable
+var zonalStat = zonalStat.map(function(feat){
+  return ee.Feature(feat.geometry(), { 
+    mapObj: feat.get('constant'),
+  });
+});
+
+return zonalStat;
+
+}
+
+var tiles = zonalStatMaker(for_2017);
+print(tiles.limit(1));
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Applying functions
+//
+/////////////////////////////////////////////////////////////////
 
 
 //2017
