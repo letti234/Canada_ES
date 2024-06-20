@@ -25,6 +25,9 @@ Map.addLayer(bbox, {color: "red"}, "Bounding box area", 0); print("Bounding box 
 
 var bboxGeo = ee.Geometry(bbox);
 
+//Tabular data production - percent land cover by grid-cells in TNRD
+
+
 
 /////////////////////////////////////////////////////////////////
 //
@@ -136,9 +139,21 @@ return forest;
 
 /////////////////////////////////////////////////////////////////
 //
-// Function to obtain zonal statistics
+// Forest data: zonal statistics
 //
 /////////////////////////////////////////////////////////////////
+
+//Visual parameters of DW categories: note that NA is black
+var dwVisParams = {
+  min: 0, max:8,
+  palette: ['#419bdf', '#397d49', '#88b053', '#7a87c6', '#e49635', '#dfc35a', '#c4281b', '#a59b8f', '	#b39fe1', '#000000']
+};
+
+
+//2017 data
+var lc_2017 = yearly_filter(2017);
+var for_2017 = forestMapMaker(lc_2017);
+
 
 //Zonal stats function
 
@@ -154,14 +169,15 @@ var zonalStat = tiles.map(function(feature) {
   }));
 });
 
+
 //Rename variable
-var zonalStat = zonalStat.map(function(feat){
+var zonalStat2 = zonalStat.map(function(feat){
   return ee.Feature(feat.geometry(), { 
-    mapObj: feat.get('constant'),
+    'mapObj': feat.get('constant'),
   });
 });
 
-return zonalStat;
+return zonalStat2;
 
 }
 
@@ -169,16 +185,7 @@ var tiles = zonalStatMaker(for_2017);
 print(tiles.limit(1));
 
 
-/////////////////////////////////////////////////////////////////
-//
-// Generate forest zonal stats: 2017 to 2023
-//
-/////////////////////////////////////////////////////////////////
 
-
-//2017 data
-var lc_2017 = yearly_filter(2017);
-var for_2017 = forestMapMaker(lc_2017);
 
 
 
