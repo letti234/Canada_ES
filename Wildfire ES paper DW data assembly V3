@@ -1,20 +1,17 @@
-/**** Start of imports. If edited, may not auto-convert in the playground. ****/
-var geometry = 
-    /* color: #d63000 */
-    /* shown: false */
-    /* displayProperties: [
-      {
-        "type": "rectangle"
-      }
-    ] */
-    ee.Geometry.Polygon(
-        [[[-139.32109375000002, 60.056450293524826],
-          [-139.32109375000002, 41.165999656105214],
-          [-51.51835937500001, 41.165999656105214],
-          [-51.51835937500001, 60.056450293524826]]], null, false);
-/***** End of imports. If edited, may not auto-convert in the playground. *****/
-//Tabular data production - percent land cover by grid-cells in TNRD
+//Tabular data production 
 
+
+/////////////////////////////////////////////////////////////////
+//
+// Visual parameters for DW maps
+//
+/////////////////////////////////////////////////////////////////
+
+//Visual parameters of DW categories: note that NA is black
+var dwVisParams = {
+  min: 0, max:8,
+  palette: ['#419bdf', '#397d49', '#88b053', '#7a87c6', '#e49635', '#dfc35a', '#c4281b', '#a59b8f', '	#b39fe1', '#000000']
+};
 
 /////////////////////////////////////////////////////////////////
 //
@@ -93,7 +90,7 @@ Map.addLayer(tiles, {color: "green"}, "Sample tiles", 0);
 
 /////////////////////////////////////////////////////////////////
 //
-// Functions to prep DW data
+// Functions to prep DW data for zonal stat extraction
 //
 /////////////////////////////////////////////////////////////////
 
@@ -101,7 +98,6 @@ Map.addLayer(tiles, {color: "green"}, "Sample tiles", 0);
 var DW = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
 .map(function(image){return image.clip(tiles)})
 .select("label").filterBounds(tiles);
-
 
 
 //Function that creates yearly modal images using summer imagery
@@ -129,10 +125,7 @@ var forest = ee.Image(1)
       .where(dwObject.gt(6).and(dwObject.lte(7)),  0) //Bare = 7
       .where(dwObject.gt(7).and(dwObject.lte(8)),  0)
       .where(dwObject.gt(98).and(dwObject.lte(99)),  0);
-
-//Unmask so missing grid-cells are identifiable
-
-
+      
 return forest;
 
 }
@@ -140,15 +133,12 @@ return forest;
 
 /////////////////////////////////////////////////////////////////
 //
-// Forest data: zonal statistics
+// Zonal stat extraction function
 //
 /////////////////////////////////////////////////////////////////
 
-//Visual parameters of DW categories: note that NA is black
-var dwVisParams = {
-  min: 0, max:8,
-  palette: ['#419bdf', '#397d49', '#88b053', '#7a87c6', '#e49635', '#dfc35a', '#c4281b', '#a59b8f', '	#b39fe1', '#000000']
-};
+
+
 
 //2017
 var lc_2017 = yearly_filter(2017);
