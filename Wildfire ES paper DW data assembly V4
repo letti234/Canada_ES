@@ -216,7 +216,7 @@ var tiles_2022 = zonalStatMaker(tiles_2021, for_2022, 'for_2022');
 // 2023
 var lc_2023 = yearly_filter(2023);
 var for_2023 = forestMapMaker(lc_2023);
-var tiles_2023 = zonalStatMaker(tiles_2022, for_2020, 'for_2023');
+var tiles_2023 = zonalStatMaker(tiles_2022, for_2023, 'for_2023');
 
 print(tiles_2023.limit(1));
 
