@@ -115,19 +115,40 @@ function yearly_filter(year){
 }
 
 
-var lc_2016 = yearly_filter(2016);
-
+//Function that makes forest map
+function forestMapMaker(dwObject){ 
 var forest = ee.Image(1)
-      .where(lc.eq(0), 0)  //Water v= 0
-      .where(lc.gt(0).and(lc.lte(1)),  1) //trees = 1
-      .where(lc.gt(1).and(lc.lte(2)),  0) //grass = 2
-      .where(lc.gt(2).and(lc.lte(3)),  0) //flooded veg = 3
-      .where(lc.gt(3).and(lc.lte(4)),  0) //crops = 4
-      .where(lc.gt(4).and(lc.lte(5)),  0) //shrub/scrub = 5
-      .where(lc.gt(5).and(lc.lte(6)),  0) //Built = 6
-      .where(lc.gt(6).and(lc.lte(7)),  0) //Bare = 7
-      .where(lc.gt(7).and(lc.lte(8)),  0) ;
+      .where(dwObject.eq(0), 0)  //Water = 0
+      .where(dwObject.gt(0).and(dwObject.lte(1)),  1) //trees = 1
+      .where(dwObject.gt(1).and(dwObject.lte(2)),  0) //grass = 2
+      .where(dwObject.gt(2).and(dwObject.lte(3)),  0) //flooded veg = 3
+      .where(dwObject.gt(3).and(dwObject.lte(4)),  0) //crops = 4
+      .where(dwObject.gt(4).and(dwObject.lte(5)),  0) //shrub/scrub = 5
+      .where(dwObject.gt(5).and(dwObject.lte(6)),  0) //Built = 6
+      .where(dwObject.gt(6).and(dwObject.lte(7)),  0) //Bare = 7
+      .where(dwObject.gt(7).and(dwObject.lte(8)),  0) ;
+
+return forest;
+
+}
+
+var lc_2017 = yearly_filter(2017);
 
 
-Map.addLayer(forest);
+var dwVisParams = {
+  min: 0, max:8,
+  palette: ['#419bdf', '#397d49', '#88b053', '#7a87c6', '#e49635', '#dfc35a', '#c4281b', '#a59b8f', '	#b39fe1']
+};
+
+
+//Map LULC
+Map.addLayer(lc_2017, dwVisParams, 'Land cover 2016');
+
+
+
+var for_2017 = forestMapMaker(lc_2017);
+
+Map.addLayer(for_2017);
+
+
 
