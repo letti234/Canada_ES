@@ -172,15 +172,28 @@ function zonalStatMaker(mapObj, propertyName) {
 }
 
 
-//2017 data
+//2017
 var lc_2017 = yearly_filter(2017);
 var for_2017 = forestMapMaker(lc_2017);
-
-
-
 var tiles = zonalStatMaker(for_2017, 'for_2017');
+// print(tiles.limit(10));
+
+//2018
+var lc_2018 = yearly_filter(2018);
+var for_2018 = forestMapMaker(lc_2018);
+var tiles = zonalStatMaker(for_2018, 'for_2018');
 print(tiles.limit(10));
 
+
+//2019
+
+//2020
+
+//2021
+
+//2022
+
+//2023
 
 
 
