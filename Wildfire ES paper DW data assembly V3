@@ -157,7 +157,7 @@ var for_2017 = forestMapMaker(lc_2017);
 
 //Zonal stats function
 
-function zonalStatMaker(mapObj) {
+function zonalStatMaker(mapObj, newProp) {
   
 //Calculate zonal stats
 var zonalStat = tiles.map(function(feature) {
@@ -170,18 +170,15 @@ var zonalStat = tiles.map(function(feature) {
 });
 
 
-//Rename variable
-var zonalStat2 = zonalStat.map(function(feat){
-  return ee.Feature(feat.geometry(), { 
-    'mapObj': feat.get('constant'),
+var zonalStat2 = zonalStat.map(function(feat) {
+    var newProperties = ee.Dictionary().set(newProp, "constant");
+    return ee.Feature(feat.geometry(), newProperties);
   });
-});
 
 return zonalStat2;
-
 }
 
-var tiles = zonalStatMaker(for_2017);
+var tiles = zonalStatMaker(for_2017, for_2017);
 print(tiles.limit(1));
 
 
