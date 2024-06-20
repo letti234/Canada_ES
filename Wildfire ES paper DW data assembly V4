@@ -146,8 +146,8 @@ return forest;
 //
 /////////////////////////////////////////////////////////////////
 
-function zonalStatMaker(mapObj, propertyName) {
-  
+// Function to calculate zonal statistics and update the tiles FeatureCollection with new properties
+function zonalStatMaker(tiles, mapObj, propertyName) {
   // Calculate zonal stats
   var zonalStat = tiles.map(function(feature) {
     var meanDict = mapObj.reduceRegion({
@@ -157,45 +157,28 @@ function zonalStatMaker(mapObj, propertyName) {
       maxPixels: 1e9
     });
 
-    return feature.set(meanDict);
+    // Extract the mean value as a number
+    var meanValue = ee.Number(meanDict.get('constant'));
+
+    // Set the new property without losing existing properties
+    return feature.set(propertyName, meanValue);
   });
 
-  // Rename variable and set unique property name
-  var zonalStat2 = zonalStat.map(function(feat) {
-    var meanValue = ee.Number(feat.get('constant')); // Extract the mean value as a number
-    var newProperties = ee.Dictionary().set(propertyName, meanValue);
-
-    return ee.Feature(feat.geometry(), newProperties);
-  });
-
-  return zonalStat2;
+  return zonalStat;
 }
 
+// Initial tiles FeatureCollection
+var initialTiles = tiles; // Assume 'tiles' is your initial FeatureCollection
 
-//2017
+// 2017
 var lc_2017 = yearly_filter(2017);
 var for_2017 = forestMapMaker(lc_2017);
-var tiles = zonalStatMaker(for_2017, 'for_2017');
-// print(tiles.limit(10));
+var tiles_2017 = zonalStatMaker(initialTiles, for_2017, 'for_2017');
 
-//2018
+// 2018
 var lc_2018 = yearly_filter(2018);
 var for_2018 = forestMapMaker(lc_2018);
-var tiles = zonalStatMaker(for_2018, 'for_2018');
-print(tiles.limit(10));
+var tiles_2018 = zonalStatMaker(tiles_2017, for_2018, 'for_2018');
 
-
-//2019
-
-//2020
-
-//2021
-
-//2022
-
-//2023
-
-
-
-
-
+// Print the final tiles FeatureCollection with properties for both years
+print(tiles_2018.limit(10));
