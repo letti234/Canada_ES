@@ -96,7 +96,7 @@ Map.addLayer(tiles, {color: "green"}, "Sample tiles", 0);
 
 /////////////////////////////////////////////////////////////////
 //
-// Functions to prep DW data
+// Function to create modal composites - Step 1
 //
 /////////////////////////////////////////////////////////////////
 
@@ -118,31 +118,10 @@ function yearly_filter(year){
 }
 
 
-//Function that makes binary raster where 1 is forest, else zero
-function forestMapMaker(dwObject){ 
-var forest = ee.Image(1)
-      .where(dwObject.eq(0), 0)  //Water = 0
-      .where(dwObject.gt(0).and(dwObject.lte(1)),  1) //trees = 1
-      .where(dwObject.gt(1).and(dwObject.lte(2)),  0) //grass = 2
-      .where(dwObject.gt(2).and(dwObject.lte(3)),  0) //flooded veg = 3
-      .where(dwObject.gt(3).and(dwObject.lte(4)),  0) //crops = 4
-      .where(dwObject.gt(4).and(dwObject.lte(5)),  0) //shrub/scrub = 5
-      .where(dwObject.gt(5).and(dwObject.lte(6)),  0) //Built = 6
-      .where(dwObject.gt(6).and(dwObject.lte(7)),  0) //Bare = 7
-      .where(dwObject.gt(7).and(dwObject.lte(8)),  0)
-      .where(dwObject.gt(98).and(dwObject.lte(99)),  0);
-
-//Unmask so missing grid-cells are identifiable
-
-
-return forest;
-
-}
-
 
 /////////////////////////////////////////////////////////////////
 //
-// Forest data: zonal statistics
+// Function that compiles zonal statistics - apply to binary classifications (Step 3)
 //
 /////////////////////////////////////////////////////////////////
 
@@ -167,8 +146,42 @@ function zonalStatMaker(tiles, mapObj, propertyName) {
   return zonalStat;
 }
 
+
+/////////////////////////////////////////////////////////////////
+//
+// Function that makes binary raster where 1 is forest, else zero - Step 2
+//
+/////////////////////////////////////////////////////////////////
+
+
+function forestMapMaker(dwObject){ 
+var forest = ee.Image(1)
+      .where(dwObject.eq(0), 0)  //Water = 0
+      .where(dwObject.gt(0).and(dwObject.lte(1)),  1) //trees = 1
+      .where(dwObject.gt(1).and(dwObject.lte(2)),  0) //grass = 2
+      .where(dwObject.gt(2).and(dwObject.lte(3)),  0) //flooded veg = 3
+      .where(dwObject.gt(3).and(dwObject.lte(4)),  0) //crops = 4
+      .where(dwObject.gt(4).and(dwObject.lte(5)),  0) //shrub/scrub = 5
+      .where(dwObject.gt(5).and(dwObject.lte(6)),  0) //Built = 6
+      .where(dwObject.gt(6).and(dwObject.lte(7)),  0) //Bare = 7
+      .where(dwObject.gt(7).and(dwObject.lte(8)),  0)
+      .where(dwObject.gt(98).and(dwObject.lte(99)),  0);
+
+//Unmask so missing grid-cells are identifiable
+
+
+return forest;
+
+}
+
+/////////////////////////////////////////////////////////////////
+//
+// Forest zonal statistics
+//
+/////////////////////////////////////////////////////////////////
+
 // Initial tiles FeatureCollection
-var initialTiles = tiles; // Assume 'tiles' is your initial FeatureCollection
+var initialTiles = tiles; 
 
 // 2017
 var lc_2017 = yearly_filter(2017);
@@ -180,5 +193,29 @@ var lc_2018 = yearly_filter(2018);
 var for_2018 = forestMapMaker(lc_2018);
 var tiles_2018 = zonalStatMaker(tiles_2017, for_2018, 'for_2018');
 
-// Print the final tiles FeatureCollection with properties for both years
-print(tiles_2018.limit(10));
+// 2019
+var lc_2019 = yearly_filter(2019);
+var for_2019 = forestMapMaker(lc_2019);
+var tiles_2019 = zonalStatMaker(tiles_2018, for_2019, 'for_2019');
+
+// 2020
+var lc_2020 = yearly_filter(2020);
+var for_2020 = forestMapMaker(lc_2020);
+var tiles_2020 = zonalStatMaker(tiles_2019, for_2020, 'for_2020');
+
+// 2021
+var lc_2021 = yearly_filter(2021);
+var for_2021 = forestMapMaker(lc_2021);
+var tiles_2021 = zonalStatMaker(tiles_2020, for_2021, 'for_2021');
+
+// 2022
+var lc_2022 = yearly_filter(2022);
+var for_2022 = forestMapMaker(lc_2022);
+var tiles_2022 = zonalStatMaker(tiles_2021, for_2022, 'for_2022');
+
+// 2023
+var lc_2023 = yearly_filter(2023);
+var for_2023 = forestMapMaker(lc_2023);
+var tiles_2023 = zonalStatMaker(tiles_2022, for_2020, 'for_2023');
+
+print(tiles_2023.limit(1));
