@@ -20,9 +20,9 @@ var dwVisParams = {
 /////////////////////////////////////////////////////////////////
 
 
-// var bbox = ee.Geometry.BBox(-140, 41, -52, 60);
+var bbox = ee.Geometry.BBox(-140, 41, -52, 60);
 
-var bbox = ee.Geometry.BBox(-110, 50, -100, 60);
+// var bbox = ee.Geometry.BBox(-110, 50, -100, 60);
 
 Map.addLayer(bbox, {color: "red"}, "Bounding box area", 0); print("Bounding box properties", bbox);
 
@@ -219,3 +219,6 @@ var for_2023 = forestMapMaker(lc_2023);
 var tiles_2023 = zonalStatMaker(tiles_2022, for_2020, 'for_2023');
 
 print(tiles_2023.limit(1));
+
+
+Export.table.toDrive(tiles_2023, "DW_output_allCan_V1", "Canada_Fires_DW");
