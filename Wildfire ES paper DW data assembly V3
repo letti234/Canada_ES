@@ -90,7 +90,7 @@ Map.addLayer(tiles, {color: "green"}, "Sample tiles", 0);
 
 /////////////////////////////////////////////////////////////////
 //
-// Functions to prep DW data for zonal stat extraction
+// Functions to prep DW data
 //
 /////////////////////////////////////////////////////////////////
 
@@ -125,7 +125,10 @@ var forest = ee.Image(1)
       .where(dwObject.gt(6).and(dwObject.lte(7)),  0) //Bare = 7
       .where(dwObject.gt(7).and(dwObject.lte(8)),  0)
       .where(dwObject.gt(98).and(dwObject.lte(99)),  0);
-      
+
+//Unmask so missing grid-cells are identifiable
+
+
 return forest;
 
 }
@@ -133,10 +136,11 @@ return forest;
 
 /////////////////////////////////////////////////////////////////
 //
-// Zonal stat extraction function
+// Function to obtain zonal statistics
 //
 /////////////////////////////////////////////////////////////////
 
+//Zonal stats function
 
 function zonalStatMaker(mapObj) {
   
@@ -167,18 +171,14 @@ print(tiles.limit(1));
 
 /////////////////////////////////////////////////////////////////
 //
-// Applying functions
+// Generate forest zonal stats: 2017 to 2023
 //
 /////////////////////////////////////////////////////////////////
 
 
-//2017
+//2017 data
 var lc_2017 = yearly_filter(2017);
 var for_2017 = forestMapMaker(lc_2017);
-
-//Maps for 2017
-Map.addLayer(lc_2017, dwVisParams, 'Land cover 2017', 0);
-Map.addLayer(for_2017, {}, "Forest cover 2017", 0);
 
 
 
