@@ -19,8 +19,11 @@ var dwVisParams = {
 //
 /////////////////////////////////////////////////////////////////
 
+//var bbox = ee.Geometry.BBox(-140, 41, -52, 60);
+
 //Split bbox in half
 var bbox = ee.Geometry.BBox(-140, 41, -95, 60);
+
 
 Map.addLayer(bbox, {color: "red"}, "Bounding box area", 0); print("Bounding box properties", bbox);
 
