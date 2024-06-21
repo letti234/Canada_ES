@@ -219,7 +219,7 @@ var tiles_2023 = zonalStatMaker(tiles_2022, for_2023, 'for_2023');
 print(tiles_2023.limit(1));
 
 
-Export.table.toDrive(tiles_2023, "DW_output_allCan_V1", "Canada_Fires_DW");
+Export.table.toDrive(tiles_2023, "DW_output_allCan_V1_SPLIT", "Canada_Fires_DW");
 
 
 
