@@ -130,13 +130,19 @@ function zonalStatMaker(tiles, mapObj, propertyName) {
   // Calculate zonal stats
   var zonalStat = tiles.map(function(feature) {
     var meanDict = mapObj.reduceRegion({
-      reducer: ee.Reducer.mean().setOutputs([mapObj]),
+      reducer: ee.Reducer.mean(),
       geometry: feature.geometry(),
       scale: 10,
       maxPixels: 1e9
     });
 
-  
+    // Extract the mean value as a number
+    var meanValue = ee.Number(meanDict.get('constant'));
+
+    // Set the new property without losing existing properties
+    return feature.set(propertyName, meanValue);
+  });
+
   return zonalStat;
 }
 
@@ -216,3 +222,11 @@ print(tiles_2023.limit(1));
 
 
 Export.table.toDrive(tiles_2023, "DW_output_allCan_V1", "Canada_Fires_DW");
+
+
+
+
+
+
+
+
