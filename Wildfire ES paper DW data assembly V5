@@ -19,10 +19,8 @@ var dwVisParams = {
 //
 /////////////////////////////////////////////////////////////////
 
-
-var bbox = ee.Geometry.BBox(-140, 41, -52, 60);
-
-// var bbox = ee.Geometry.BBox(-110, 50, -100, 60);
+//Split bbox in half
+var bbox = ee.Geometry.BBox(-140, 41, -95, 60);
 
 Map.addLayer(bbox, {color: "red"}, "Bounding box area", 0); print("Bounding box properties", bbox);
 
@@ -228,5 +226,22 @@ Export.table.toDrive(tiles_2023, "DW_output_allCan_V1", "Canada_Fires_DW");
 
 
 
+// // Visualization parameters
+// var visParams = {
+//   min: 0,
+//   max: 1,
+//   palette: ['red', 'yellow', 'green']
+// };
 
+// var limitedTiles = tiles_2023.limit(100);
+
+// // Add the for_2018 property to the map
+// var for2018Image = limitedTiles.reduceToImage({
+//   properties: ['for_2018'],
+//   reducer: ee.Reducer.first()
+// });
+
+
+
+// Map.addLayer(for2018Image, visParams, "2018 forest cover");
 
