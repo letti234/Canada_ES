@@ -1,0 +1,134 @@
+/**** Start of imports. If edited, may not auto-convert in the playground. ****/
+var geometry = 
+    /* color: #00ffff */
+    /* shown: false */
+    ee.Geometry.Polygon(
+        [[[-134.04558104007052, 57.99898453293004],
+          [-132.28776854007052, 56.40438579727052],
+          [-131.14519041507052, 55.568621152365466],
+          [-131.89226072757052, 54.48557762008607],
+          [-128.72819822757052, 51.27864851809599],
+          [-129.12370604007052, 50.22214886700588],
+          [-125.25651854007052, 48.563408951847904],
+          [-121.91667479007052, 47.919541215594805],
+          [-120.94987791507052, 48.62154071448213],
+          [-113.12761229007052, 48.62154071448213],
+          [-114.70964354007052, 50.446552907139356],
+          [-119.54362791507052, 54.15236282319764],
+          [-119.71940916507052, 60.2748815723453],
+          [-139.93425291507052, 60.2748815723453],
+          [-137.03386229007052, 58.1616306609258],
+          [-134.92448729007052, 58.75928122597682]]]);
+/***** End of imports. If edited, may not auto-convert in the playground. *****/
+//////////////////////////////////////////////////////////////////////////////////
+
+// DESCRIPTION:
+
+//   Code performs following tasks 
+  
+    // Calls on burned areas 2017-2018
+    // Merges burned areas into one shapefile composite
+    // Creates 10 km buffer around burned areas
+    // Extracts Dynamic World raster data for 2017 in these areas
+    // Exports the raster data
+
+// Purpose of this step
+    // Our overall goal is to export data we can work with in R, which is more user-friendly than
+    // GEE. To that end, we need Dynamic World data for burned areas 2017-2022, as well as areas close
+    // to burn areas. We can do additional cleaning and varible production in R.
+
+//Nathaniel to-do
+   // 1. Import burned area data for 2019-2022 as assets
+   // 2. Update the composite of burned areas - you want to have one polygon layer that shows all
+   // areas affected by wildfire at some point 2017-2022.
+   // 3. Generate the 10 km buffer areas for the updated burned areas polygons
+   // 4. Update the timeframe of the modal composite - based on what you think is the best window, given
+   //    the time that non-permanent ice and snow is melted and the timing of wildfire season.
+   // 5. Create annual modal composites
+   // 6. Export each modal composite (each is an Image): there will be an Image for every year
+   
+//Note: the geometry used to subset burned areas is drawn manually. It is computationally intensive
+//to subset the burned areas to BC because the province geometry has lots of complex linestrings.
+
+//////////////////////////////////////////////////////////////////////////////////
+//
+//Call on and prepare wildfire data
+//
+//////////////////////////////////////////////////////////////////////////////////
+
+var BC = ee.FeatureCollection("FAO/GAUL/2015/level2")
+.filter(ee.Filter.eq("ADM1_CODE", 826));
+
+// Map.addLayer(BC);
+print(BC);
+
+
+var roi = BC.filter(ee.Filter.eq("ADM2_NAME", "Cariboo"));
+
+Map.addLayer(roi);
+
+//Fires in 2017, use polygon to clip to roughly BC
+var fires_17 = 
+ee.FeatureCollection('users/salem043/CAN_FIRES/nbac_2017_r9_20210810').filterBounds(roi);
+
+//Fires in 2018, use polygon to clip to rougly BC
+var fires_18 = ee.FeatureCollection('users/salem043/CAN_FIRES/nbac_2018_r9_20210810').filterBounds(roi);
+
+//Combine the fire shapefiles
+var fires = fires_17.merge(fires_18);
+
+Map.addLayer(fires);
+
+//////////////////////////////////////////////////////////////////////////////////
+//
+//Call on Dynamic World data
+//Create a 2017 composite using modal characteristic during designated season
+//I use June 1st to July 31st, please use the season you think is most suitable
+//
+//////////////////////////////////////////////////////////////////////////////////
+
+// //Clip Dynamic World to buffer areas and select hard classification layer (of land cover classes)
+var lulc = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
+.map(function(image){return image.clip(roi)})
+.select("label");
+ 
+ 
+//Create a modal compsite for the defined dates in 2017 (an Image)
+var lc_17 = lulc
+  .filterDate("2017-06-01", "2020-08-31")
+  .reduce(ee.Reducer.mode());
+
+//////////////////////////////////////////////////////////////////////////////////
+//
+//Map composite using a nice color palette
+//
+//////////////////////////////////////////////////////////////////////////////////
+
+
+var dwVisParams = {
+  min: 0, max:8,
+  palette: ['#419bdf', '#397d49', '#88b053', '#7a87c6', '#e49635', '#dfc35a', '#c4281b', '#a59b8f', '	#b39fe1']
+};
+
+Map.centerObject(roi);
+
+//Map LULC
+Map.addLayer(lc_17, dwVisParams, 'Land cover 2017');
+
+// //////////////////////////////////////////////////////////////////////////////////
+// //
+// //Export image to GDrive - create a folder in your associated Google Drive called
+// //Canada_Fires_DW, the export will automatically go there
+// //
+// //////////////////////////////////////////////////////////////////////////////////
+
+
+Export.image.toDrive({
+  image: lc_17,
+  scale: 10,
+  description: 'Cariboo_LULC_2017',
+  fileFormat: 'GEOTIFF',
+  folder: "Canada_Fires_DW",  
+  maxPixels: 9e10,
+  region: roi
+});
