@@ -492,8 +492,6 @@ var tiles_2022_8 = zonalStatMaker(tiles_2021_8,  bar_2022, 'bar_2022');
 var bar_2023 = MapMaker(lc_2023, "bare");
 var tiles_2023_8 = zonalStatMaker(tiles_2022_8,  bar_2023, 'bar_2023');
 
-Export.table.toDrive(tiles_2023, "DW_output_allCan_V1_SPLIT", "Canada_Fires_DW");
-
 
 
 
