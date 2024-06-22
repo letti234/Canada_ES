@@ -202,18 +202,6 @@ var lc_2021 = yearly_filter(2021);
 var lc_2022 = yearly_filter(2022);
 var lc_2023 = yearly_filter(2023);
 
-
-
-
-
-
-
-
-
-
-
-
-
 /////////////////////////////////////////////////////////////////
 //
 // Water zonal statistics
@@ -231,7 +219,6 @@ for (var i = 0; i < years.length; i++) {
   tiles = zonalStatMaker(tiles, forest, 'wat_' + year);
 }
 
-print(tiles.limit(5));
 
 /////////////////////////////////////////////////////////////////
 //
@@ -246,13 +233,47 @@ for (var i = 0; i < years.length; i++) {
   var year = years[i];
   var lc_year = lc[i];
   
-  var forest = MapMaker(lc_year, "forest");
-  tiles = zonalStatMaker(tiles, forest, 'for_' + year);
+  var binary = MapMaker(lc_year, "forest");
+  tiles = zonalStatMaker(tiles, binary, 'for_' + year);
 }
 
-print(tiles.limit(5));
+
+/////////////////////////////////////////////////////////////////
+//
+// Grasslands zonal statistics
+//
+/////////////////////////////////////////////////////////////////
+
+var years = [2017, 2018, 2019, 2020, 2021, 2022, 2023];
+var lc = [lc_2017, lc_2018, lc_2019, lc_2020, lc_2021, lc_2022, lc_2023];
+
+for (var i = 0; i < years.length; i++) {
+  var year = years[i];
+  var lc_year = lc[i];
+  
+  var binary = MapMaker(lc_year, "grass");
+  tiles = zonalStatMaker(tiles, binary, 'gra_' + year);
+}
+
+/////////////////////////////////////////////////////////////////
+//
+// Flooded veg zonal statistics
+//
+/////////////////////////////////////////////////////////////////
+
+var years = [2017, 2018, 2019, 2020, 2021, 2022, 2023];
+var lc = [lc_2017, lc_2018, lc_2019, lc_2020, lc_2021, lc_2022, lc_2023];
+
+for (var i = 0; i < years.length; i++) {
+  var year = years[i];
+  var lc_year = lc[i];
+  
+  var binary = MapMaker(lc_year, "flooded");
+  tiles = zonalStatMaker(tiles, binary, 'flo_' + year);
+}
 
 
+print(tiles.limit(2));
 
 // function MapMaker(dwObject, lulc) {
 //   // Create a map of lulc values to their respective indexes
