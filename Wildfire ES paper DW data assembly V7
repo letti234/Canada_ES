@@ -123,7 +123,22 @@ function yearly_filter(year){
 
 /////////////////////////////////////////////////////////////////
 //
-// Function that makes binary raster where 1 is forest, else zero - Step 2
+// Production of annual composites using function
+//
+/////////////////////////////////////////////////////////////////
+
+var lc_2017 = yearly_filter(2017);
+var lc_2018 = yearly_filter(2018);
+var lc_2019 = yearly_filter(2019);
+var lc_2020 = yearly_filter(2020);
+var lc_2021 = yearly_filter(2021);
+var lc_2022 = yearly_filter(2022);
+var lc_2023 = yearly_filter(2023);
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Function that makes binary raster where 1 is a given LULC class, else zero - Step 2
 //
 /////////////////////////////////////////////////////////////////
 
@@ -188,19 +203,7 @@ function zonalStatMaker(tiles, mapObj, propertyName) {
 }
 
 
-/////////////////////////////////////////////////////////////////
-//
-// Use function for annual composites
-//
-/////////////////////////////////////////////////////////////////
 
-var lc_2017 = yearly_filter(2017);
-var lc_2018 = yearly_filter(2018);
-var lc_2019 = yearly_filter(2019);
-var lc_2020 = yearly_filter(2020);
-var lc_2021 = yearly_filter(2021);
-var lc_2022 = yearly_filter(2022);
-var lc_2023 = yearly_filter(2023);
 
 /////////////////////////////////////////////////////////////////
 //
@@ -384,22 +387,9 @@ for (var i = 0; i < years.length; i++) {
 
 print(tiles.limit(1));
 
-// function MapMaker(dwObject, lulc) {
-//   // Create a map of lulc values to their respective indexes
-//   var lulcMap = {
-//     water: 0,
-//     forest: 1,
-//     grass: 2,
-//     flooded: 3,
-//     crops: 4,
-//     shrub: 5,
-//     built: 6,
-//     bare: 7,
-//     snow: 8,
-//     missing: 99
-//   };
 
-//Export.table.toDrive(tiles_2023_10, "DW_output_allCan_V1_ALLVARS_SPLIT", "Canada_Fires_DW");
+
+Export.table.toDrive(tiles_2023_10, "DW_output_allCan_V1_ALLVARS_SPLIT", "Canada_Fires_DW");
 
 
 
