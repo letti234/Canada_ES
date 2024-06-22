@@ -1,0 +1,277 @@
+//Tabular data production 
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Visual parameters for DW maps
+//
+/////////////////////////////////////////////////////////////////
+
+//Visual parameters of DW categories: note that NA is black
+var dwVisParams = {
+  min: 0, max:8,
+  palette: ['#419bdf', '#397d49', '#88b053', '#7a87c6', '#e49635', '#dfc35a', '#c4281b', '#a59b8f', '	#b39fe1', '#000000']
+};
+
+/////////////////////////////////////////////////////////////////
+//
+// Define our region of interest using a bounding box
+//
+/////////////////////////////////////////////////////////////////
+
+//var bbox = ee.Geometry.BBox(-140, 41, -52, 60);
+
+//Split bbox in half
+var bbox = ee.Geometry.BBox(-140, 41, -95, 60);
+
+
+Map.addLayer(bbox, {color: "red"}, "Bounding box area", 0); print("Bounding box properties", bbox);
+
+var bboxGeo = ee.Geometry(bbox);
+
+//Tabular data production - percent land cover by grid-cells in TNRD
+
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Create 1 degree grid-cells
+//
+/////////////////////////////////////////////////////////////////
+
+
+//Develop code using very coarse grid-cells
+
+var tiles = tile(bboxGeo, 1); 
+
+function tile(region, size_in_degrees) {
+  function tile_geometry(geometry) {
+    var coords = ee.List(geometry.bounds().coordinates().get(0))
+    var min_point = ee.List(coords.get(0))
+    var max_point = ee.List(coords.get(2))
+  
+    function sequence(direction) {
+      var start = min_point.get(direction)  
+      var stop = ee.Number(max_point.get(direction))
+      return ee.List.sequence(start, stop, size_in_degrees)
+    }
+  
+    var tiles = sequence(0).map(function (x) {
+      return sequence(1).map(function (y) { 
+          return ee.Feature(ee.Geometry.Rectangle([
+            [ee.Number(x), ee.Number(y)],
+            [
+              ee.Number(x).add(size_in_degrees).min(max_point.get(0)),
+              ee.Number(y).add(size_in_degrees).min(max_point.get(1))
+            ]
+        ]).intersection(geometry, 30))
+      })
+  	}).flatten()
+    return ee.FeatureCollection(tiles).filterBounds(geometry)
+  }
+
+  function tile_feature_collection(feature_collection) {
+    return ee.FeatureCollection(
+      feature_collection.iterate(
+        function (feature, acc) {
+          return ee.FeatureCollection(acc).merge(tile_geometry(ee.Feature(feature).geometry()))
+        }, ee.FeatureCollection([]))
+    )
+  }
+
+  if (region instanceof ee.FeatureCollection)
+    return tile_feature_collection(region)
+  else if (region instanceof ee.Feature)
+    return tile_geometry(region.geometry())
+  else if (region instanceof ee.Geometry)
+    return tile_geometry(region)
+  else
+    throw Error(
+      'region must be ee.FeatureCollection, ee.Feature, or ee.Geometry. Was ' + region
+    )
+}
+
+//Mapping of tiles
+
+Map.addLayer(tiles, {color: "green"}, "Sample tiles", 0);
+
+/////////////////////////////////////////////////////////////////
+//
+// Function to create modal composites - Step 1
+//
+/////////////////////////////////////////////////////////////////
+
+//DW data extraction
+var DW = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
+.map(function(image){return image.clip(tiles)})
+.select("label").filterBounds(tiles);
+
+
+//Function that creates yearly modal images using summer imagery
+//Reclassify missing grid-cells as 99
+function yearly_filter(year){
+  
+  var modal_image = DW
+       .filterDate(year.toString()+'-06-01',year.toString()+'-08-31')
+       .reduce(ee.Reducer.mode()).unmask(99);
+  return modal_image;
+  
+}
+
+/////////////////////////////////////////////////////////////////
+//
+// Function that makes binary raster where 1 is forest, else zero - Step 2
+//
+/////////////////////////////////////////////////////////////////
+
+
+function MapMaker(dwObject, lulc) {
+  // Create a map of lulc values to their respective indexes
+  var lulcMap = {
+    water: 0,
+    forest: 1,
+    grass: 2,
+    flooded: 3,
+    crops: 4,
+    shrub: 5,
+    built: 6,
+    bare: 7,
+    snow: 8
+  };
+
+  // Check if the provided lulc is valid
+  if (!(lulc in lulcMap)) {
+    throw new Error('Invalid lulc type');
+  }
+
+  // Get the index for the specified lulc
+  var index = lulcMap[lulc];
+
+  // Create an ee.Image and set the values based on the index
+  var result = ee.Image(0)
+    .where(dwObject.eq(index), 1)
+    .where(dwObject.neq(index), 0);
+
+  return result;
+}
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Function that compiles zonal statistics - apply to binary classifications (Step 3)
+//
+/////////////////////////////////////////////////////////////////
+
+// Function to calculate zonal statistics and update the tiles FeatureCollection with new properties
+function zonalStatMaker(tiles, mapObj, propertyName) {
+  // Calculate zonal stats
+  var zonalStat = tiles.map(function(feature) {
+    var meanDict = mapObj.reduceRegion({
+      reducer: ee.Reducer.mean(),
+      geometry: feature.geometry(),
+      scale: 10,
+      maxPixels: 1e9
+    });
+
+    // Extract the mean value as a number
+    var meanValue = ee.Number(meanDict.get('constant'));
+
+    // Set the new property without losing existing properties
+    return feature.set(propertyName, meanValue);
+  });
+
+  return zonalStat;
+}
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Forest zonal statistics
+//
+/////////////////////////////////////////////////////////////////
+
+// Initial tiles FeatureCollection
+var initialTiles = tiles; 
+
+
+// 2017
+var lc_2017 = yearly_filter(2017);
+var for_2017 = MapMaker(lc_2017, "forest");
+var tiles_2017 = zonalStatMaker(initialTiles, for_2017, 'for_2017');
+
+// 2018
+var lc_2018 = yearly_filter(2018);
+var for_2018 = MapMaker(lc_2018, "forest");
+var tiles_2018 = zonalStatMaker(tiles_2017, for_2018, 'for_2018');
+
+// 2019
+var lc_2019 = yearly_filter(2019);
+var for_2019 = MapMaker(lc_2019, "forest");
+var tiles_2019 = zonalStatMaker(tiles_2018, for_2019, 'for_2019');
+
+// 2020
+var lc_2020 = yearly_filter(2020);
+var for_2020 = MapMaker(lc_2020, "forest");
+var tiles_2020 = zonalStatMaker(tiles_2019, for_2020, 'for_2020');
+
+// 2021
+var lc_2021 = yearly_filter(2021);
+var for_2021 = MapMaker(lc_2021, "forest");
+var tiles_2021 = zonalStatMaker(tiles_2020, for_2021, 'for_2021');
+
+// 2022
+var lc_2022 = yearly_filter(2022);
+var for_2022 = MapMaker(lc_2022, "forest");
+var tiles_2022 = zonalStatMaker(tiles_2021, for_2022, 'for_2022');
+
+// 2023
+var lc_2023 = yearly_filter(2023);
+var for_2023 = MapMaker(lc_2023, "forest");
+var tiles_2023 = zonalStatMaker(tiles_2022, for_2023, 'for_2023');
+
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Grasslands zonal statistics
+//
+/////////////////////////////////////////////////////////////////
+
+
+// 2017
+var gra_2017 = MapMaker(lc_2017, "grass");
+var tiles_2017_2 = zonalStatMaker(tiles_2023, gra_2017, 'gra_2017');
+
+// 2018
+var gra_2018 = MapMaker(lc_2018, "grass");
+var tiles_2018_2 = zonalStatMaker(tiles_2017_2, gra_2018, 'gra_2018');
+
+// 2019
+var gra_2019 = MapMaker(lc_2019, "grass");
+var tiles_2019_2 = zonalStatMaker(tiles_2018_2, gra_2019, 'gra_2019');
+
+// 2020
+var gra_2020 = MapMaker(lc_2020, "grass");
+var tiles_2020_2 = zonalStatMaker(tiles_2019_2, gra_2020, 'gra_2020');
+
+// 2021
+var gra_2021 = MapMaker(lc_2021, "grass");
+var tiles_2021_2 = zonalStatMaker(tiles_2020_2, gra_2021, 'gra_2021');
+
+// 2022
+var gra_2022 = MapMaker(lc_2022, "grass");
+var tiles_2022_2 = zonalStatMaker(tiles_2021_2, gra_2022, 'gra_2022');
+
+// 2023
+var gra_2023 = MapMaker(lc_2023, "grass");
+var tiles_2023_2 = zonalStatMaker(tiles_2022_2, gra_2023, 'gra_2023');
+
+
+
+
+
+Export.table.toDrive(tiles_2023, "DW_output_allCan_V1_SPLIT", "Canada_Fires_DW");
+
+
+
+
