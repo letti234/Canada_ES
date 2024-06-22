@@ -23,10 +23,10 @@ var dwVisParams = {
 //var bbox = ee.Geometry.BBox(-140, 41, -52, 60);
 
 //Split bbox in half
-// var bbox = ee.Geometry.BBox(-140, 49, -95, 60);
+var bbox = ee.Geometry.BBox(-140, 49, -95, 60);
 
 //For code development
-var bbox = ee.Geometry.BBox(-100, 58, -97, 60);
+//var bbox = ee.Geometry.BBox(-100, 58, -97, 60);
 
 Map.addLayer(bbox, {color: "red"}, "Bounding box area", 0); print("Bounding box properties", bbox);
 
@@ -389,7 +389,7 @@ print(tiles.limit(1));
 
 
 
-Export.table.toDrive(tiles_2023_10, "DW_output_allCan_V2_ALLVARS_SPLIT", "Canada_Fires_DW");
+Export.table.toDrive(tiles, "DW_output_allCan_V2_ALLVARS_SPLIT", "Canada_Fires_DW");
 
 
 
