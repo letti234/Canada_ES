@@ -26,7 +26,7 @@ var dwVisParams = {
 // var bbox = ee.Geometry.BBox(-140, 49, -95, 60);
 
 //For code development
-var bbox = ee.Geometry.BBox(-100, 55, -95, 60);
+var bbox = ee.Geometry.BBox(-100, 58, -97, 60);
 
 Map.addLayer(bbox, {color: "red"}, "Bounding box area", 0); print("Bounding box properties", bbox);
 
@@ -273,7 +273,116 @@ for (var i = 0; i < years.length; i++) {
 }
 
 
-print(tiles.limit(2));
+/////////////////////////////////////////////////////////////////
+//
+// Cropland zonal statistics
+//
+/////////////////////////////////////////////////////////////////
+
+var years = [2017, 2018, 2019, 2020, 2021, 2022, 2023];
+var lc = [lc_2017, lc_2018, lc_2019, lc_2020, lc_2021, lc_2022, lc_2023];
+
+for (var i = 0; i < years.length; i++) {
+  var year = years[i];
+  var lc_year = lc[i];
+  
+  var binary = MapMaker(lc_year, "crops");
+  tiles = zonalStatMaker(tiles, binary, 'cro_' + year);
+}
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Shrubland zonal statistics
+//
+/////////////////////////////////////////////////////////////////
+
+var years = [2017, 2018, 2019, 2020, 2021, 2022, 2023];
+var lc = [lc_2017, lc_2018, lc_2019, lc_2020, lc_2021, lc_2022, lc_2023];
+
+for (var i = 0; i < years.length; i++) {
+  var year = years[i];
+  var lc_year = lc[i];
+  
+  var binary = MapMaker(lc_year, "shrub");
+  tiles = zonalStatMaker(tiles, binary, 'shr_' + year);
+}
+
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Built/developed zonal statistics
+//
+/////////////////////////////////////////////////////////////////
+
+var years = [2017, 2018, 2019, 2020, 2021, 2022, 2023];
+var lc = [lc_2017, lc_2018, lc_2019, lc_2020, lc_2021, lc_2022, lc_2023];
+
+for (var i = 0; i < years.length; i++) {
+  var year = years[i];
+  var lc_year = lc[i];
+  
+  var binary = MapMaker(lc_year, "built");
+  tiles = zonalStatMaker(tiles, binary, 'bui_' + year);
+}
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Bare ground zonal statistics
+//
+/////////////////////////////////////////////////////////////////
+
+var years = [2017, 2018, 2019, 2020, 2021, 2022, 2023];
+var lc = [lc_2017, lc_2018, lc_2019, lc_2020, lc_2021, lc_2022, lc_2023];
+
+for (var i = 0; i < years.length; i++) {
+  var year = years[i];
+  var lc_year = lc[i];
+  
+  var binary = MapMaker(lc_year, "bare");
+  tiles = zonalStatMaker(tiles, binary, 'bar_' + year);
+}
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Snow/ice zonal statistics
+//
+/////////////////////////////////////////////////////////////////
+
+var years = [2017, 2018, 2019, 2020, 2021, 2022, 2023];
+var lc = [lc_2017, lc_2018, lc_2019, lc_2020, lc_2021, lc_2022, lc_2023];
+
+for (var i = 0; i < years.length; i++) {
+  var year = years[i];
+  var lc_year = lc[i];
+  
+  var binary = MapMaker(lc_year, "snow");
+  tiles = zonalStatMaker(tiles, binary, 'sno_' + year);
+}
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Missing zonal statistics
+//
+/////////////////////////////////////////////////////////////////
+
+var years = [2017, 2018, 2019, 2020, 2021, 2022, 2023];
+var lc = [lc_2017, lc_2018, lc_2019, lc_2020, lc_2021, lc_2022, lc_2023];
+
+for (var i = 0; i < years.length; i++) {
+  var year = years[i];
+  var lc_year = lc[i];
+  
+  var binary = MapMaker(lc_year, "missing");
+  tiles = zonalStatMaker(tiles, binary, 'mis_' + year);
+}
+
+
+print(tiles.limit(1));
 
 // function MapMaker(dwObject, lulc) {
 //   // Create a map of lulc values to their respective indexes
