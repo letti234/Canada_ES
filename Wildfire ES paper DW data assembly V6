@@ -136,7 +136,8 @@ function MapMaker(dwObject, lulc) {
     shrub: 5,
     built: 6,
     bare: 7,
-    snow: 8
+    snow: 8,
+    missing: 99
   };
 
   // Check if the provided lulc is valid
@@ -269,6 +270,152 @@ var tiles_2023_2 = zonalStatMaker(tiles_2022_2, gra_2023, 'gra_2023');
 
 
 
+/////////////////////////////////////////////////////////////////
+//
+// Water zonal statistics
+//
+///////////////////////////////////////////////////////////////////
+  
+  
+  // 2017
+var wat_2017 = MapMaker(lc_2017, "water");
+var tiles_2017_3 = zonalStatMaker(tiles_2023_2, wat_2017, 'wat_2017');
+
+// 2018
+var wat_2018 = MapMaker(lc_2018, "water");
+var tiles_2018_3 = zonalStatMaker(tiles_2017_2, wat_2018, 'wat_2018');
+
+// 2019
+var wat_2019 = MapMaker(lc_2019, "water");
+var tiles_2019_3 = zonalStatMaker(tiles_2018_2, wat_2019, 'wat_2019');
+
+// 2020
+var wat_2020 = MapMaker(lc_2020, "water");
+var tiles_2020_3 = zonalStatMaker(tiles_2019_2, wat_2020, 'wat_2020');
+
+// 2021
+var wat_2021 = MapMaker(lc_2021, "water");
+var tiles_2021_3 = zonalStatMaker(tiles_2020_2, wat_2021, 'wat_2021');
+
+// 2022
+var wat_2022 = MapMaker(lc_2022, "water");
+var tiles_2022_3 = zonalStatMaker(tiles_2021_2, wat_2022, 'wat_2022');
+
+// 2023
+var wat_2023 = MapMaker(lc_2023, "water");
+var tiles_2023_3 = zonalStatMaker(tiles_2022_2, wat_2023, 'wat_2023');
+
+
+
+
+/////////////////////////////////////////////////////////////////
+//
+// flooded zonal statistics
+//
+///////////////////////////////////////////////////////////////////
+  
+  
+  // 2017
+var flo_2017 = MapMaker(lc_2017, "flooded");
+var tiles_2017_4 = zonalStatMaker(tiles_2023_3, flo_2017, 'flo_2017');
+
+// 2018
+var flo_2018 = MapMaker(lc_2018, "flooded");
+var tiles_2018_4 = zonalStatMaker(tiles_2017_4, flo_2018, 'flo_2018');
+
+// 2019
+var flo_2019 = MapMaker(lc_2019, "flooded");
+var tiles_2019_4 = zonalStatMaker(tiles_2018_4, flo_2019, 'flo_2019');
+
+// 2020
+var flo_2020 = MapMaker(lc_2020, "flooded");
+var tiles_2020_4 = zonalStatMaker(tiles_2019_4, flo_2020, 'flo_2020');
+
+// 2021
+var flo_2021 = MapMaker(lc_2021, "flooded");
+var tiles_2021_4 = zonalStatMaker(tiles_2020_4, flo_2021, 'flo_2021');
+
+// 2022
+var flo_2022 = MapMaker(lc_2022, "flooded");
+var tiles_2022_4 = zonalStatMaker(tiles_2021_4, flo_2022, 'flo_2022');
+
+// 2023
+var flo_2023 = MapMaker(lc_2023, "flooded");
+var tiles_2023_4 = zonalStatMaker(tiles_2022_4, flo_2023, 'flo_2023');
+
+
+
+/////////////////////////////////////////////////////////////////
+//
+// crops zonal statistics
+//
+///////////////////////////////////////////////////////////////////
+  
+  
+  // 2017
+var crop_2017 = MapMaker(lc_2017, "crops");
+var tiles_2017_5 = zonalStatMaker(tiles_2023_4, crop_2017, 'crop_2017');
+
+// 2018
+var crop_2018 = MapMaker(lc_2018, "crops");
+var tiles_2018_5 = zonalStatMaker(tiles_2017_5, crop_2018, 'crop_2018');
+
+// 2019
+var crop_2019 = MapMaker(lc_2019, "crops");
+var tiles_2019_5 = zonalStatMaker(tiles_2018_5, crop_2019, 'crop_2019');
+
+// 2020
+var crop_2020 = MapMaker(lc_2020, "crops");
+var tiles_2020_5 = zonalStatMaker(tiles_2019_5, crop_2020, 'crop_2020');
+
+// 2021
+var crop_2021 = MapMaker(lc_2021, "crops");
+var tiles_2021_5 = zonalStatMaker(tiles_2020_5, crop_2021, 'crop_2021');
+
+// 2022
+var crop_2022 = MapMaker(lc_2022, "crops");
+var tiles_2022_5 = zonalStatMaker(tiles_2021_5, crop_2022, 'crop_2022');
+
+// 2023
+var crop_2023 = MapMaker(lc_2023, "crops");
+var tiles_2023_5 = zonalStatMaker(tiles_2022_5, crop_2023, 'crop_2023');
+
+
+
+/////////////////////////////////////////////////////////////////
+//
+// shrub zonal statistics
+//
+///////////////////////////////////////////////////////////////////
+  
+  
+  // 2017
+var shr_2017 = MapMaker(lc_2017, "shrub");
+var tiles_2017_6 = zonalStatMaker(tiles_2023_5, shr_2017, 'shr_2017');
+
+// 2018
+var shr_2018 = MapMaker(lc_2018, "shrub");
+var tiles_2018_6 = zonalStatMaker(tiles_2017_6, shr_2018, 'shr_2018');
+
+// 2019
+var shr_2019 = MapMaker(lc_2019, "shrub");
+var tiles_2019_6 = zonalStatMaker(tiles_2018_6, shr_2019, 'shr_2019');
+
+// 2020
+var shr_2020 = MapMaker(lc_2020, "shrub");
+var tiles_2020_6 = zonalStatMaker(tiles_2019_6, shr_2020, 'shr_2020');
+
+// 2021
+var shr_2021 = MapMaker(lc_2021, "shrub");
+var tiles_2021_6 = zonalStatMaker(tiles_2020_6, shr_2021, 'shr_2021');
+
+// 2022
+var shr_2022 = MapMaker(lc_2022, "shrub");
+var tiles_2022_6 = zonalStatMaker(tiles_2021_6, shr_2022, 'shr_2022');
+
+// 2023
+var shr_2023 = MapMaker(lc_2023, "shrub");
+var tiles_2023_6 = zonalStatMaker(tiles_2022_6, shr_2023, 'shr_2023');
 
 Export.table.toDrive(tiles_2023, "DW_output_allCan_V1_SPLIT", "Canada_Fires_DW");
 
