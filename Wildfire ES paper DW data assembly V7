@@ -389,7 +389,7 @@ print(tiles.limit(1));
 
 
 
-Export.table.toDrive(tiles_2023_10, "DW_output_allCan_V1_ALLVARS_SPLIT", "Canada_Fires_DW");
+Export.table.toDrive(tiles_2023_10, "DW_output_allCan_V2_ALLVARS_SPLIT", "Canada_Fires_DW");
 
 
 
