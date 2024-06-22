@@ -22,7 +22,7 @@ var dwVisParams = {
 //var bbox = ee.Geometry.BBox(-140, 41, -52, 60);
 
 //Split bbox in half
-var bbox = ee.Geometry.BBox(-140, 41, -95, 60);
+var bbox = ee.Geometry.BBox(-140, 49, -95, 60);
 
 
 Map.addLayer(bbox, {color: "red"}, "Bounding box area", 0); print("Bounding box properties", bbox);
@@ -417,7 +417,173 @@ var tiles_2022_6 = zonalStatMaker(tiles_2021_6, shr_2022, 'shr_2022');
 var shr_2023 = MapMaker(lc_2023, "shrub");
 var tiles_2023_6 = zonalStatMaker(tiles_2022_6, shr_2023, 'shr_2023');
 
+
+
+/////////////////////////////////////////////////////////////////
+//
+// built zonal statistics
+//
+///////////////////////////////////////////////////////////////////
+  
+  
+// 2017
+var bui_2017 = MapMaker(lc_2017, "built");
+var tiles_2017_7 = zonalStatMaker(tiles_2023_6, bui_2017, 'bui_2017');
+
+// 2018
+var bui_2018 = MapMaker(lc_2018, "built");
+var tiles_2018_7 = zonalStatMaker(tiles_2017_7,  bui_2018, 'bui_2018');
+
+// 2019
+var bui_2019 = MapMaker(lc_2019, "built");
+var tiles_2019_7 = zonalStatMaker(tiles_2018_7,  bui_2019, 'bui_2019');
+
+// 2020
+var bui_2020 = MapMaker(lc_2020, "built");
+var tiles_2020_7 = zonalStatMaker(tiles_2019_7,  bui_2020, 'bui_2020');
+
+// 2021
+var bui_2021 = MapMaker(lc_2021, "built");
+var tiles_2021_7 = zonalStatMaker(tiles_2020_7,  bui_2021, 'bui_2021');
+
+// 2022
+var bui_2022 = MapMaker(lc_2022, "built");
+var tiles_2022_7 = zonalStatMaker(tiles_2021_7,  bui_2022, 'bui_2022');
+
+// 2023
+var bui_2023 = MapMaker(lc_2023, "built");
+var tiles_2023_7 = zonalStatMaker(tiles_2022_7,  bui_2023, 'bui_2023');
+
+
+
+
+/////////////////////////////////////////////////////////////////
+//
+// bare zonal statistics
+//
+///////////////////////////////////////////////////////////////////
+  
+  
+// 2017
+var bar_2017 = MapMaker(lc_2017, "bare");
+var tiles_2017_8 = zonalStatMaker(tiles_2023_7, bar_2017, 'bar_2017');
+
+// 2018
+var bar_2018 = MapMaker(lc_2018, "bare");
+var tiles_2018_8 = zonalStatMaker(tiles_2017_8,  bar_2018, 'bar_2018');
+
+// 2019
+var bar_2019 = MapMaker(lc_2019, "bare");
+var tiles_2019_8 = zonalStatMaker(tiles_2018_8,  bar_2019, 'bar_2019');
+
+// 2020
+var bar_2020 = MapMaker(lc_2020, "bare");
+var tiles_2020_8 = zonalStatMaker(tiles_2019_8,  bar_2020, 'bar_2020');
+
+// 2021
+var bar_2021 = MapMaker(lc_2021, "bare");
+var tiles_2021_8 = zonalStatMaker(tiles_2020_8,  bar_2021, 'bar_2021');
+
+// 2022
+var bar_2022 = MapMaker(lc_2022, "bare");
+var tiles_2022_8 = zonalStatMaker(tiles_2021_8,  bar_2022, 'bar_2022');
+
+// 2023
+var bar_2023 = MapMaker(lc_2023, "bare");
+var tiles_2023_8 = zonalStatMaker(tiles_2022_8,  bar_2023, 'bar_2023');
+
 Export.table.toDrive(tiles_2023, "DW_output_allCan_V1_SPLIT", "Canada_Fires_DW");
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////
+//
+// snow zonal statistics
+//
+///////////////////////////////////////////////////////////////////
+  
+  
+// 2017
+var sno_2017 = MapMaker(lc_2017, "snow");
+var tiles_2017_9 = zonalStatMaker(tiles_2023_8, sno_2017, 'sno_2017');
+
+// 2018
+var sno_2018 = MapMaker(lc_2018, "snow");
+var tiles_2018_9 = zonalStatMaker(tiles_2017_9,  sno_2018, 'sno_2018');
+
+// 2019
+var sno_2019 = MapMaker(lc_2019, "snow");
+var tiles_2019_9 = zonalStatMaker(tiles_2018_9,  sno_2019, 'sno_2019');
+
+// 2020
+var sno_2020 = MapMaker(lc_2020, "snow");
+var tiles_2020_9 = zonalStatMaker(tiles_2019_9,  sno_2020, 'sno_2020');
+
+// 2021
+var sno_2021 = MapMaker(lc_2021, "snow");
+var tiles_2021_9 = zonalStatMaker(tiles_2020_9,  sno_2021, 'sno_2021');
+
+// 2022
+var sno_2022 = MapMaker(lc_2022, "snow");
+var tiles_2022_9 = zonalStatMaker(tiles_2021_9,  sno_2022, 'sno_2022');
+
+// 2023
+var sno_2023 = MapMaker(lc_2023, "snow");
+var tiles_2023_9 = zonalStatMaker(tiles_2022_9,  sno_2023, 'sno_2023');
+
+
+/////////////////////////////////////////////////////////////////
+//
+// missing zonal statistics
+//
+///////////////////////////////////////////////////////////////////
+  
+  
+// 2017
+var mis_2017 = MapMaker(lc_2017, "missing");
+var tiles_2017_10 = zonalStatMaker(tiles_2023_9, mis_2017, 'mis_2017');
+
+// 2018
+var mis_2018 = MapMaker(lc_2018, "missing");
+var tiles_2018_10 = zonalStatMaker(tiles_2017_10,  mis_2018, 'mis_2018');
+
+// 2019
+var mis_2019 = MapMaker(lc_2019, "missing");
+var tiles_2019_10 = zonalStatMaker(tiles_2018_10,  mis_2019, 'mis_2019');
+
+// 2020
+var mis_2020 = MapMaker(lc_2020, "missing");
+var tiles_2020_10 = zonalStatMaker(tiles_2019_10,  mis_2020, 'mis_2020');
+
+// 2021
+var mis_2021 = MapMaker(lc_2021, "missing");
+var tiles_2021_10 = zonalStatMaker(tiles_2020_10,  mis_2021, 'mis_2021');
+
+// 2022
+var mis_2022 = MapMaker(lc_2022, "missing");
+var tiles_2022_10 = zonalStatMaker(tiles_2021_10,  mis_2022, 'mis_2022');
+
+// 2023
+var mis_2023 = MapMaker(lc_2023, "missing");
+var tiles_2023_10 = zonalStatMaker(tiles_2022_10,  mis_2023, 'mis_2023');
+
+
+print(tiles_2023_10.limit(1));
+
+
+
+
+
+
+
+
+
+
+
+Export.table.toDrive(tiles_2023_10, "DW_output_allCan_V1_ALLVARS_SPLIT", "Canada_Fires_DW");
 
 
 
