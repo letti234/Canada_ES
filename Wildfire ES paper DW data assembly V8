@@ -1,0 +1,405 @@
+//Tabular data production 
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Visual parameters for DW maps
+//
+/////////////////////////////////////////////////////////////////
+
+//Visual parameters of DW categories: note that NA is black
+var dwVisParams = {
+  min: 0, max:8,
+  palette: ['#419bdf', '#397d49', '#88b053', '#7a87c6', '#e49635', '#dfc35a', '#c4281b', '#a59b8f', '	#b39fe1', '#000000']
+};
+
+/////////////////////////////////////////////////////////////////
+//
+// Define our region of interest using a bounding box
+//
+/////////////////////////////////////////////////////////////////
+
+//Original bbox
+//var bbox = ee.Geometry.BBox(-140, 41, -52, 60);
+
+//Split bbox into one quarter or original size
+var bbox = ee.Geometry.BBox(-140, 49, -115, 60);
+
+/////////////////////////////////////////////////////////////////
+//
+// Find area of the bbox
+//
+/////////////////////////////////////////////////////////////////
+
+// Calculate the area in square meters
+var areaSqMeters = bbox.area(1); //Error margin of 1
+
+// Convert the area to square kilometers
+var areaSqKm = areaSqMeters.divide(1e6);
+
+// Print the area in square kilometers
+print('Area in square kilometers:', areaSqKm);
+Map.addLayer(bbox, {color: "red"}, "Bounding box area", 0); print("Bounding box properties", bbox);
+
+var bboxGeo = ee.Geometry(bbox);
+
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Create 1 degree grid-cells
+//
+/////////////////////////////////////////////////////////////////
+
+
+//Develop code using very coarse grid-cells
+
+var tiles = tile(bboxGeo, 1); 
+
+function tile(region, size_in_degrees) {
+  function tile_geometry(geometry) {
+    var coords = ee.List(geometry.bounds().coordinates().get(0))
+    var min_point = ee.List(coords.get(0))
+    var max_point = ee.List(coords.get(2))
+  
+    function sequence(direction) {
+      var start = min_point.get(direction)  
+      var stop = ee.Number(max_point.get(direction))
+      return ee.List.sequence(start, stop, size_in_degrees)
+    }
+  
+    var tiles = sequence(0).map(function (x) {
+      return sequence(1).map(function (y) { 
+          return ee.Feature(ee.Geometry.Rectangle([
+            [ee.Number(x), ee.Number(y)],
+            [
+              ee.Number(x).add(size_in_degrees).min(max_point.get(0)),
+              ee.Number(y).add(size_in_degrees).min(max_point.get(1))
+            ]
+        ]).intersection(geometry, 30))
+      })
+  	}).flatten()
+    return ee.FeatureCollection(tiles).filterBounds(geometry)
+  }
+
+  function tile_feature_collection(feature_collection) {
+    return ee.FeatureCollection(
+      feature_collection.iterate(
+        function (feature, acc) {
+          return ee.FeatureCollection(acc).merge(tile_geometry(ee.Feature(feature).geometry()))
+        }, ee.FeatureCollection([]))
+    )
+  }
+
+  if (region instanceof ee.FeatureCollection)
+    return tile_feature_collection(region)
+  else if (region instanceof ee.Feature)
+    return tile_geometry(region.geometry())
+  else if (region instanceof ee.Geometry)
+    return tile_geometry(region)
+  else
+    throw Error(
+      'region must be ee.FeatureCollection, ee.Feature, or ee.Geometry. Was ' + region
+    )
+}
+
+//Mapping of tiles
+
+Map.addLayer(tiles, {color: "green"}, "Sample tiles", 0);
+
+/////////////////////////////////////////////////////////////////
+//
+// Function to create modal composites - Step 1
+//
+/////////////////////////////////////////////////////////////////
+
+//DW data extraction
+var DW = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
+.map(function(image){return image.clip(tiles)})
+.select("label").filterBounds(tiles);
+
+
+//Function that creates yearly modal images using summer imagery
+//Reclassify missing grid-cells as 99
+function yearly_filter(year){
+  
+  var modal_image = DW
+       .filterDate(year.toString()+'-06-01',year.toString()+'-08-31')
+       .reduce(ee.Reducer.mode()).unmask(99);
+  return modal_image;
+  
+}
+
+/////////////////////////////////////////////////////////////////
+//
+// Production of annual composites using function
+//
+/////////////////////////////////////////////////////////////////
+
+var lc_2017 = yearly_filter(2017);
+var lc_2018 = yearly_filter(2018);
+var lc_2019 = yearly_filter(2019);
+var lc_2020 = yearly_filter(2020);
+var lc_2021 = yearly_filter(2021);
+var lc_2022 = yearly_filter(2022);
+var lc_2023 = yearly_filter(2023);
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Function that makes binary raster where 1 is a given LULC class, else zero - Step 2
+//
+/////////////////////////////////////////////////////////////////
+
+
+function MapMaker(dwObject, lulc) {
+  // Create a map of lulc values to their respective indexes
+  var lulcMap = {
+    water: 0,
+    forest: 1,
+    grass: 2,
+    flooded: 3,
+    crops: 4,
+    shrub: 5,
+    built: 6,
+    bare: 7,
+    snow: 8,
+    missing: 99
+  };
+
+  // Check if the provided lulc is valid
+  if (!(lulc in lulcMap)) {
+    throw new Error('Invalid lulc type');
+  }
+
+  // Get the index for the specified lulc
+  var index = lulcMap[lulc];
+
+  // Create an ee.Image and set the values based on the index
+  var result = ee.Image(0)
+    .where(dwObject.eq(index), 1)
+    .where(dwObject.neq(index), 0);
+
+  return result;
+}
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Function that compiles zonal statistics - apply to binary classifications (Step 3)
+//
+/////////////////////////////////////////////////////////////////
+
+// Function to calculate zonal statistics and update the tiles FeatureCollection with new properties
+function zonalStatMaker(tiles, mapObj, propertyName) {
+  // Calculate zonal stats
+  var zonalStat = tiles.map(function(feature) {
+    var meanDict = mapObj.reduceRegion({
+      reducer: ee.Reducer.mean(),
+      geometry: feature.geometry(),
+      scale: 10,
+      maxPixels: 1e9
+    });
+
+    // Extract the mean value as a number
+    var meanValue = ee.Number(meanDict.get('constant'));
+
+    // Set the new property without losing existing properties
+    return feature.set(propertyName, meanValue);
+  });
+
+  return zonalStat;
+}
+
+
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Water zonal statistics
+//
+/////////////////////////////////////////////////////////////////
+
+var years = [2017, 2018, 2019, 2020, 2021, 2022, 2023];
+var lc = [lc_2017, lc_2018, lc_2019, lc_2020, lc_2021, lc_2022, lc_2023];
+
+for (var i = 0; i < years.length; i++) {
+  var year = years[i];
+  var lc_year = lc[i];
+  
+  var forest = MapMaker(lc_year, "water");
+  tiles = zonalStatMaker(tiles, forest, 'wat_' + year);
+}
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Forest zonal statistics
+//
+/////////////////////////////////////////////////////////////////
+
+var years = [2017, 2018, 2019, 2020, 2021, 2022, 2023];
+var lc = [lc_2017, lc_2018, lc_2019, lc_2020, lc_2021, lc_2022, lc_2023];
+
+for (var i = 0; i < years.length; i++) {
+  var year = years[i];
+  var lc_year = lc[i];
+  
+  var binary = MapMaker(lc_year, "forest");
+  tiles = zonalStatMaker(tiles, binary, 'for_' + year);
+}
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Grasslands zonal statistics
+//
+/////////////////////////////////////////////////////////////////
+
+var years = [2017, 2018, 2019, 2020, 2021, 2022, 2023];
+var lc = [lc_2017, lc_2018, lc_2019, lc_2020, lc_2021, lc_2022, lc_2023];
+
+for (var i = 0; i < years.length; i++) {
+  var year = years[i];
+  var lc_year = lc[i];
+  
+  var binary = MapMaker(lc_year, "grass");
+  tiles = zonalStatMaker(tiles, binary, 'gra_' + year);
+}
+
+/////////////////////////////////////////////////////////////////
+//
+// Flooded veg zonal statistics
+//
+/////////////////////////////////////////////////////////////////
+
+var years = [2017, 2018, 2019, 2020, 2021, 2022, 2023];
+var lc = [lc_2017, lc_2018, lc_2019, lc_2020, lc_2021, lc_2022, lc_2023];
+
+for (var i = 0; i < years.length; i++) {
+  var year = years[i];
+  var lc_year = lc[i];
+  
+  var binary = MapMaker(lc_year, "flooded");
+  tiles = zonalStatMaker(tiles, binary, 'flo_' + year);
+}
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Cropland zonal statistics
+//
+/////////////////////////////////////////////////////////////////
+
+var years = [2017, 2018, 2019, 2020, 2021, 2022, 2023];
+var lc = [lc_2017, lc_2018, lc_2019, lc_2020, lc_2021, lc_2022, lc_2023];
+
+for (var i = 0; i < years.length; i++) {
+  var year = years[i];
+  var lc_year = lc[i];
+  
+  var binary = MapMaker(lc_year, "crops");
+  tiles = zonalStatMaker(tiles, binary, 'cro_' + year);
+}
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Shrubland zonal statistics
+//
+/////////////////////////////////////////////////////////////////
+
+var years = [2017, 2018, 2019, 2020, 2021, 2022, 2023];
+var lc = [lc_2017, lc_2018, lc_2019, lc_2020, lc_2021, lc_2022, lc_2023];
+
+for (var i = 0; i < years.length; i++) {
+  var year = years[i];
+  var lc_year = lc[i];
+  
+  var binary = MapMaker(lc_year, "shrub");
+  tiles = zonalStatMaker(tiles, binary, 'shr_' + year);
+}
+
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Built/developed zonal statistics
+//
+/////////////////////////////////////////////////////////////////
+
+var years = [2017, 2018, 2019, 2020, 2021, 2022, 2023];
+var lc = [lc_2017, lc_2018, lc_2019, lc_2020, lc_2021, lc_2022, lc_2023];
+
+for (var i = 0; i < years.length; i++) {
+  var year = years[i];
+  var lc_year = lc[i];
+  
+  var binary = MapMaker(lc_year, "built");
+  tiles = zonalStatMaker(tiles, binary, 'bui_' + year);
+}
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Bare ground zonal statistics
+//
+/////////////////////////////////////////////////////////////////
+
+var years = [2017, 2018, 2019, 2020, 2021, 2022, 2023];
+var lc = [lc_2017, lc_2018, lc_2019, lc_2020, lc_2021, lc_2022, lc_2023];
+
+for (var i = 0; i < years.length; i++) {
+  var year = years[i];
+  var lc_year = lc[i];
+  
+  var binary = MapMaker(lc_year, "bare");
+  tiles = zonalStatMaker(tiles, binary, 'bar_' + year);
+}
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Snow/ice zonal statistics
+//
+/////////////////////////////////////////////////////////////////
+
+var years = [2017, 2018, 2019, 2020, 2021, 2022, 2023];
+var lc = [lc_2017, lc_2018, lc_2019, lc_2020, lc_2021, lc_2022, lc_2023];
+
+for (var i = 0; i < years.length; i++) {
+  var year = years[i];
+  var lc_year = lc[i];
+  
+  var binary = MapMaker(lc_year, "snow");
+  tiles = zonalStatMaker(tiles, binary, 'sno_' + year);
+}
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Missing zonal statistics
+//
+/////////////////////////////////////////////////////////////////
+
+var years = [2017, 2018, 2019, 2020, 2021, 2022, 2023];
+var lc = [lc_2017, lc_2018, lc_2019, lc_2020, lc_2021, lc_2022, lc_2023];
+
+for (var i = 0; i < years.length; i++) {
+  var year = years[i];
+  var lc_year = lc[i];
+  
+  var binary = MapMaker(lc_year, "missing");
+  tiles = zonalStatMaker(tiles, binary, 'mis_' + year);
+}
+
+
+print(tiles.limit(1));
+
+
+
+Export.table.toDrive(tiles, "DW_output_allCan_V2_ALLVARS_SPLIT_1", "Canada_Fires_DW");
+
+
+
+
