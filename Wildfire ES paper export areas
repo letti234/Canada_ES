@@ -5,7 +5,6 @@
 // Define our region of interest using a bounding box
 //
 /////////////////////////////////////////////////////////////////
-//-95 - lake in the woods
 
 //Original bbox
 var bbox = ee.Geometry.BBox(-140, 49, -52, 60);
