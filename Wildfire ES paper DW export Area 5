@@ -18,11 +18,7 @@ var dwVisParams = {
 //
 /////////////////////////////////////////////////////////////////
 
-//Original bbox
-var bbox = ee.Geometry.BBox(-83, 41, -71, 60);
-
-//Split bbox into one quarter or original size
-//var bbox = ee.Geometry.BBox(-140, 49, -115, 60);
+var bbox = ee.Geometry.BBox(-71, 41, -59, 60);
 
 /////////////////////////////////////////////////////////////////
 //
@@ -399,7 +395,7 @@ print(tiles.limit(1));
 
 
 
-Export.table.toDrive(tiles, "DW_Zonal_Stats_BBOX4", "Canada_Fires_DW");
+Export.table.toDrive(tiles, "DW_Zonal_Stats_BBOX5", "Canada_Fires_DW");
 
 
 
