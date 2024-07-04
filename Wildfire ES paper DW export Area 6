@@ -18,7 +18,7 @@ var dwVisParams = {
 //
 /////////////////////////////////////////////////////////////////
 
-var bbox = ee.Geometry.BBox(-71, 41, -59, 60);
+var bbox = ee.Geometry.BBox(-59, 41, -52, 60);
 
 /////////////////////////////////////////////////////////////////
 //
@@ -37,10 +37,6 @@ print('Area in square kilometers:', areaSqKm);
 Map.addLayer(bbox, {color: "red"}, "Bounding box area", 0); print("Bounding box properties", bbox);
 
 var bboxGeo = ee.Geometry(bbox);
-
-//Bbox is approximately 1.9m sq km
-
-//Entire area is 6.9 sq km, this is about one-quarter (27%) of original bbox
 
 /////////////////////////////////////////////////////////////////
 //
@@ -395,7 +391,7 @@ print(tiles.limit(1));
 
 
 
-Export.table.toDrive(tiles, "DW_Zonal_Stats_BBOX5", "Canada_Fires_DW");
+Export.table.toDrive(tiles, "DW_Zonal_Stats_BBOX6", "Canada_Fires_DW");
 
 
 
