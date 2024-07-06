@@ -20,6 +20,7 @@ var dwVisParams = {
 
 var bbox = ee.Geometry.BBox(-140, 49, -117, 60);
 
+
 /////////////////////////////////////////////////////////////////
 //
 // Find area of the bbox
@@ -387,17 +388,77 @@ for (var i = 0; i < years.length; i++) {
 }
 
 
-print(tiles.limit(1));
+// print(tiles.limit(1));
 
 
 /////////////////////////////////////////////////////////////////
 //
-// Missing zonal statistics
+// NBAC percent intersection - function
 //
 /////////////////////////////////////////////////////////////////
 
+var BurnAreaPct = function(tile, year) {
 
-Export.table.toDrive(tiles, "DW_Zonal_Stats_BBOX1", "Canada_Fires_DW");
+//Call on NBAC data, simplifying geometry (otherwise there are too many linestrings, GEE gives an error)
+   var nbac = ee.FeatureCollection('users/salem043/CAN_FIRES/nbac_' + year) // Replace with your asset ID pattern
+                .map(function(feature) {
+                  return feature.simplify({ maxError: 10 }); // Adjust maxError as needed
+                });
+//Find geometry intersections
+  var intersection = tile.intersection(nbac.geometry(), ee.ErrorMargin(1));
+  var tileArea = tile.geometry().area(); //Find area of each tile in tiles
+  var burnedArea = intersection.area(); //Find the area of the intersection
+  var burnedAreaPercentage = burnedArea.divide(tileArea).multiply(100); //Maths
+  var propertyName = 'nbac_' + year; //Give new property a name
+  return tile.set(propertyName, burnedAreaPercentage);
+};
+
+
+/////////////////////////////////////////////////////////////////
+//
+// Apply NBAC
+//
+/////////////////////////////////////////////////////////////////
+
+var year = 2017; // Change this to the year you are interested in
+var tiles = tiles.map(function(tile) {
+  return BurnAreaPct(tile, year);
+});
+
+var year = 2018; // Change this to the year you are interested in
+var tiles = tiles.map(function(tile) {
+  return BurnAreaPct(tile, year);
+});
+
+var year = 2019; // Change this to the year you are interested in
+var tiles = tiles.map(function(tile) {
+  return BurnAreaPct(tile, year);
+});
+
+var year = 2020; // Change this to the year you are interested in
+var tiles = tiles.map(function(tile) {
+  return BurnAreaPct(tile, year);
+});
+
+var year = 2021; // Change this to the year you are interested in
+var tiles = tiles.map(function(tile) {
+  return BurnAreaPct(tile, year);
+});
+
+var year = 2022; // Change this to the year you are interested in
+var tiles = tiles.map(function(tile) {
+  return BurnAreaPct(tile, year);
+});
+
+var year = 2023; // Change this to the year you are interested in
+var tiles = tiles.map(function(tile) {
+  return BurnAreaPct(tile, year);
+});
+
+
+
+
+Export.table.toDrive(tiles, "DW_Zonal_Stats_BBOX1_with_Burns", "Canada_Fires_DW");
 
 
 
