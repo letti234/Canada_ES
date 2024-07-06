@@ -457,7 +457,7 @@ var tiles = tiles.map(function(tile) {
 
 
 
-Export.table.toDrive(tiles, "DW_Zonal_Stats_BBOX1_with_Burns", "Canada_Fires_DW");
+Export.table.toDrive(tiles, "DW_Zonal_Stats_BBOX5_with_Burns", "Canada_Fires_DW");
 
 
 
