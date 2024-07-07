@@ -18,7 +18,7 @@ var dwVisParams = {
 //
 /////////////////////////////////////////////////////////////////
 
-var bbox = ee.Geometry.BBox(-71, 41, -59, 60);
+var bbox = ee.Geometry.BBox(-130, 49, -120, 60);
 
 /////////////////////////////////////////////////////////////////
 //
@@ -457,7 +457,7 @@ var tiles = tiles.map(function(tile) {
 
 
 
-Export.table.toDrive(tiles, "DW_Zonal_Stats_BBOX5_with_Burns", "Canada_Fires_DW");
+Export.table.toDrive(tiles, "DW_Zonal_Stats_demobox_with_Burns", "Canada_Fires_DW");
 
 
 
