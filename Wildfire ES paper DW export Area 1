@@ -27,7 +27,7 @@ var bbox = ee.Geometry.BBox(-140, 49, -117, 60);
 /////////////////////////////////////////////////////////////////
 
 // Calculate the area in square meters
-var areaSqMeters = bbox.area(1); //Error margin of 1
+var areaSqMeters = bbox.area(0.5); //Error margin of 1
 
 // Convert the area to square kilometers
 var areaSqKm = areaSqMeters.divide(1e6);
@@ -391,7 +391,7 @@ print(tiles.limit(1));
 
 
 
-Export.table.toDrive(tiles, "DW_Zonal_Stats_BBOX1", "Canada_Fires_DW");
+Export.table.toDrive(tiles, "DW_Zonal_Stats_0p5_BBOX1", "Canada_Fires_DW");
 
 
 
