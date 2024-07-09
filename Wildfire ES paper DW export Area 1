@@ -18,7 +18,7 @@ var dwVisParams = {
 //
 /////////////////////////////////////////////////////////////////
 
-var bbox = ee.Geometry.BBox(-140, 49, -117, 60);
+var bbox = ee.Geometry.BBox(-140, 49, -130, 60);
 
 /////////////////////////////////////////////////////////////////
 //
@@ -27,7 +27,7 @@ var bbox = ee.Geometry.BBox(-140, 49, -117, 60);
 /////////////////////////////////////////////////////////////////
 
 // Calculate the area in square meters
-var areaSqMeters = bbox.area(0.1); //Error margin of 1
+var areaSqMeters = bbox.area(1); 
 
 // Convert the area to square kilometers
 var areaSqKm = areaSqMeters.divide(1e6);
@@ -47,7 +47,7 @@ var bboxGeo = ee.Geometry(bbox);
 
 //Develop code using very coarse grid-cells
 
-var tiles = tile(bboxGeo, 1); 
+var tiles = tile(bboxGeo, 0.1); 
 
 function tile(region, size_in_degrees) {
   function tile_geometry(geometry) {
