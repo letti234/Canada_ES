@@ -41,7 +41,7 @@ Map.addLayer(roi, {color: 'FF0000'}, 'BC Bounding Box');
 //Each "chunk" has a width of 5 and a height of 12
 
 //Chunk 1
-var bbox = ee.Geometry.BBox(-140, 49, -135, 60);
+var bbox = ee.Geometry.BBox(-117, 49, -115, 60);
 
 Map.addLayer(bbox, {}, "bbox 1")
 
