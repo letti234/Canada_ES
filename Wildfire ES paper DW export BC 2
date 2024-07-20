@@ -43,7 +43,7 @@ Map.addLayer(roi, {color: 'FF0000'}, 'BC Bounding Box');
 //Each "chunk" has a width of 5 and a height of 12
 
 //Chunk 1
-var bbox = ee.Geometry.BBox(-116, 49, -114, 60);
+var bbox = ee.Geometry.BBox(-118, 49, -116, 60);
 
 //This chunk executed successfully, and it's 158,000 km^2.
 Map.addLayer(bbox, {}, "bbox 1");
@@ -419,7 +419,7 @@ print(tiles.limit(1));
 
 
 
-Export.table.toDrive(tiles, "DW_Zonal_Stats_BC_0p1_BBOX1", "Canada_Fires_DW");
+Export.table.toDrive(tiles, "DW_Zonal_Stats_BC_0p1_BBOX2", "Canada_Fires_DW");
 
 
 
