@@ -1,0 +1,12 @@
+var bbox1 = ee.Geometry.BBox(-116, 49, -114, 60);
+var bbox2 = ee.Geometry.BBox(-118, 49, -116, 60);
+var bbox3 = ee.Geometry.BBox(-120, 49, -118, 60);
+var bbox4 = ee.Geometry.BBox(-122, 49, -120, 60);
+var bbox5 = ee.Geometry.BBox(-124, 49, -122, 60);
+
+
+Map.addLayer(bbox1, {color: 'red'}, '1');
+Map.addLayer(bbox2, {color: 'orange'}, '2');
+Map.addLayer(bbox3, {color: 'yellow'}, '3');
+Map.addLayer(bbox4, {color: 'green'}, '4');
+Map.addLayer(bbox5, {color: 'blue'}, '4');
