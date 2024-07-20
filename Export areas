@@ -3,10 +3,26 @@ var bbox2 = ee.Geometry.BBox(-118, 49, -116, 60);
 var bbox3 = ee.Geometry.BBox(-120, 49, -118, 60);
 var bbox4 = ee.Geometry.BBox(-122, 49, -120, 60);
 var bbox5 = ee.Geometry.BBox(-124, 49, -122, 60);
+var bbox6 = ee.Geometry.BBox(-126, 49, -124, 60);
+var bbox7 = ee.Geometry.BBox(-128, 49, -126, 60);
+var bbox8 = ee.Geometry.BBox(-130, 49, -128, 60);
+var bbox9 = ee.Geometry.BBox(-132, 49, -130, 60);
+var bbox10 = ee.Geometry.BBox(-134, 49, -132, 60);
+var bbox11 = ee.Geometry.BBox(-136, 49, -134, 60);
+var bbox12 = ee.Geometry.BBox(-138, 49, -136, 60);
+var bbox13 = ee.Geometry.BBox(-140, 49, -138, 60);
 
 
 Map.addLayer(bbox1, {color: 'red'}, '1');
 Map.addLayer(bbox2, {color: 'orange'}, '2');
 Map.addLayer(bbox3, {color: 'yellow'}, '3');
 Map.addLayer(bbox4, {color: 'green'}, '4');
-Map.addLayer(bbox5, {color: 'blue'}, '4');
+Map.addLayer(bbox5, {color: 'blue'}, '5');
+Map.addLayer(bbox6, {color: 'indigo'}, '6');
+Map.addLayer(bbox7, {color: 'violet'}, '7');
+Map.addLayer(bbox8, {color: 'brown'}, '8');
+Map.addLayer(bbox9, {color: 'grey'}, '9');
+Map.addLayer(bbox10, {color: 'pink'}, '10');
+Map.addLayer(bbox11, {color: 'lightblue'}, '11');
+Map.addLayer(bbox12, {color: 'black'}, '12');
+Map.addLayer(bbox13, {color: 'forestgreen'}, '13');
