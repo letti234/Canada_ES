@@ -419,7 +419,7 @@ print(tiles.limit(1));
 
 
 
-Export.table.toDrive(tiles, "DW_Zonal_Stats_BC_0p1_BBOX12", "Canada_Fires_DW");
+Export.table.toDrive(tiles, "DW_Zonal_Stats_BC_0p1_BBOX13", "Canada_Fires_DW");
 
 
 
