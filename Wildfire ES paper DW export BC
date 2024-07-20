@@ -43,6 +43,7 @@ Map.addLayer(roi, {color: 'FF0000'}, 'BC Bounding Box');
 //Chunk 1
 var bbox = ee.Geometry.BBox(-117, 49, -115, 60);
 
+//This chunk executed successfully, and it's 158,000 km^2.
 Map.addLayer(bbox, {}, "bbox 1")
 
 /////////////////////////////////////////////////////////////////
