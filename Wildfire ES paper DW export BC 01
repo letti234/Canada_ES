@@ -75,7 +75,7 @@ var bboxGeo = ee.Geometry(bbox);
 
 //Develop code using very coarse grid-cells
 
-var tiles = tile(bboxGeo, 0.1); 
+var tiles = tile(bboxGeo, 0.05); 
 
 function tile(region, size_in_degrees) {
   function tile_geometry(geometry) {
@@ -419,7 +419,7 @@ print(tiles.limit(1));
 
 
 
-Export.table.toDrive(tiles, "DW_Zonal_Stats_BC_0p1_BBOX1", "Canada_Fires_DW");
+Export.table.toDrive(tiles, "DW_Zonal_Stats_BC_0p05_BBOX1", "Canada_Fires_DW");
 
 
 
